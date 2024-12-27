@@ -1,0 +1,87 @@
+\documentclass[12pt,a4paper]{article}
+
+% Quelques options d'encodage, de langues et de format du document
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[top=2cm, bottom=3cm, left=1.75cm, right=1.75cm]{geometry}
+\usepackage{setspace}
+
+\usepackage{graphicx} % Pour la commande "\includegraphics"
+\usepackage{hyperref} % Pour la commande "\url"
+
+\pagenumbering{gobble}
+
+\begin{document}
+
+\begin{center}
+    \begin{tabular}{|p{0.2\textwidth}|p{0.75\textwidth}|}
+        \hline
+        {
+            \vspace{0cm} % without it, bugs, don't know why?
+            \centerline{\includegraphics[width=\linewidth]{tp-ipp.png}}
+        }
+         & {
+                \vspace{0cm} % same here
+                \centering
+                \large
+                {\hfill January, 2025}
+
+                \vspace*{.5cm}
+                \textbf{APM\_5AI29\_TP}
+
+                \vspace*{.5cm}
+                \setstretch{1.5}
+                {\Large\textbf{Language Models and Structured Data}}
+
+                \vspace*{.5cm}
+                Mid-term Project Report
+
+                \vspace*{1cm}
+                %{\hfill\href{http://teaching.simplicitytheory.science}{teaching.simplicitytheory.science}}
+        }    \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\noindent Acronym of the Team: AWESome\\
+Name: Ardi Nurgaha; Eddie Groh; Sriraam Appakutti; William Liaw
+
+    {\centering\rule{\linewidth}{.5pt}}
+
+
+%\maketitle
+\begin{center}
+    \section*{This is the title of my project}
+\end{center}
+\section*{Abstract}
+
+2/3 lines of abstract
+
+\section*{Problem Statement}
+
+Explain which problem (and task) you're addressing.
+It should be framed as a problem (typically something desirable we want, or something undesirable we don't want, or something we don't understand, or something surprising).
+
+\section*{Method/Overall Architecture}
+
+Description of your model
+
+\section*{Experimentation}
+
+\begin{itemize}
+    \item Dataset \& Dataset Statistics
+    \item Experimental Results based on Evaluation Metrics
+    \item Error Analysis
+\end{itemize}
+
+\section*{Discussion}
+
+Comparison with expectations, limitations, lessons learned, and perspectives.
+
+\section*{Bibliography}
+
+All useful references with links.
+
+
+\end{document}
