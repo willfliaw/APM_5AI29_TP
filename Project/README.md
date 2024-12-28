@@ -31,3 +31,4 @@ Note: This is not intended to be a comprehensive review of state-of-the-art tech
     -   Tomaz's Medium page contains several interesting projects that may serve as inspiration, especially regarding the integration of Neo4j and LangChain.
 - [A comprehensive overview of knowledge graph completion](https://www.sciencedirect.com/science/article/abs/pii/S095070512200805X) (This is behind a paywall but could prove interesting)
 - [A Review of Knowledge Graph Completion](https://arxiv.org/abs/2208.11652)
+- [A very simple PyKEEN tutorial](https://github.com/wasit7/pykeen-tutorial/blob/main/basic/01%20pykeen%20tutorial.ipynb)
