@@ -17,6 +17,8 @@
     pdfpagemode=UseNone
 ]{hyperref} % Pour la commande "\url"
 
+\pagenumbering{gobble}
+
 % ------------------------------------------------------------------
 % CITATION MANAGEMENT
 % ------------------------------------------------------------------
@@ -34,7 +36,11 @@
 \usepackage{etoolbox}
 \patchcmd{\thebibliography}{\section*{\refname}}{\section*{Bibliography}}{}{}
 
-\pagenumbering{gobble}
+% ------------------------------------------------------------------
+% SUBFIGURE MANAGEMENT
+% ------------------------------------------------------------------
+
+\usepackage{subcaption}
 
 \begin{document}
 
