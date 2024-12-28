@@ -42,6 +42,44 @@
 
 \usepackage{subcaption}
 
+% ------------------------------------------------------------------
+% COLORED TEXT MANAGEMENT
+% ------------------------------------------------------------------
+
+\usepackage{xcolor}
+
+% ------------------------------------------------------------------
+% CODE MANAGEMENT
+% ------------------------------------------------------------------
+
+\usepackage{listings}
+
+\lstdefinelanguage{Cypher}{
+    morekeywords={
+        MATCH, RETURN, WHERE, CREATE, DELETE, SET, MERGE, DETACH,
+        WITH, LIMIT, SKIP, ORDER, BY, DESC, ASC, OPTIONAL, CALL
+    },
+    sensitive=true,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+% Listing style for better readability
+\lstset{
+    language=Cypher,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{orange},
+    commentstyle=\color{gray},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny,
+    breaklines=true,
+    frame=single
+}
+
 \begin{document}
 
 \begin{center}
@@ -79,7 +117,7 @@ Name: Ardiansyah Nurgaha; Eddie Groh; Sriraam Appakutti; William Liaw.
     {\centering\rule{\linewidth}{.5pt}}
 
 \begin{center}
-    \section*{This is the title of my project}
+    \section*{Multi-class link prediction with PyKEEN and Large Language Models}
 \end{center}
 
 \input{doc/abstract}

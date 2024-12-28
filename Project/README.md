@@ -26,6 +26,9 @@ Note: This is not intended to be a comprehensive review of state-of-the-art tech
 
 ## Useful Resources
 
+- Dataset
+  - For now, we are using a [subset of the Hetionet](https://drive.google.com/file/d/1u34cFBYvBtdBsqOUPdmbcIyIt88IiZYe/view?usp=sharing)
+  - Later on, it may be worth it to move forward with the [whole dataset](https://github.com/hetio/hetionet/tree/main/hetnet/neo4j)
 -   [Knowledge Graph Completion with PyKEEN and Neo4j – Towards Data Science](https://towardsdatascience.com/knowledge-graph-completion-with-pykeen-and-neo4j-6bca734edf43)
     - [Systematic integration of biomedical knowledge prioritizes drugs for repurposing](https://pmc.ncbi.nlm.nih.gov/articles/PMC5640425/)
     -   Tomaz's Medium page contains several interesting projects that may serve as inspiration, especially regarding the integration of Neo4j and LangChain.
