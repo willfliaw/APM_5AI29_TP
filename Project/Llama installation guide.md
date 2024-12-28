@@ -173,7 +173,7 @@ Below is a revised, step-by-step guide for installing and configuring Ollama on 
 
 22. Install ollama
 
-    Use `pip` to install ollama as `conda`'s distribution seems to be currently broken
+    Use `pip` to install ollama (as `conda`'s distribution seems to be currently broken) and PyKEEN (as there is currently no distribution on conda's channels)
 
     ```bash
     pip install ollama pykeen

@@ -44,7 +44,7 @@ For practical exercises, you will need Python, PyTorch, and libraries for NLP an
    ```bash
    conda activate lm-structured
    ```
-3. Install ollama and pykeen:
+3. Install ollama and PyKEEN:
    ```bash
    pip install ollama pykeen
    ```
