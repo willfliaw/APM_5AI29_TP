@@ -8,7 +8,31 @@
 \usepackage{setspace}
 
 \usepackage{graphicx} % Pour la commande "\includegraphics"
-\usepackage{hyperref} % Pour la commande "\url"
+\usepackage[ % Modified parameters
+    bookmarks,
+    colorlinks,
+    citecolor=black,
+    urlcolor=blue,
+    linkcolor=black,
+    pdfpagemode=UseNone
+]{hyperref} % Pour la commande "\url"
+
+% ------------------------------------------------------------------
+% CITATION MANAGEMENT
+% ------------------------------------------------------------------
+
+% APA Style
+\usepackage{cite}
+\bibliographystyle{apalike}
+
+\renewcommand\refname{Bibliography}
+
+% Proper formatting and line breaking for URLs
+\usepackage{url}
+
+% Change "References" to "Bibliography"
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{\section*{Bibliography}}{}{}
 
 \pagenumbering{gobble}
 
@@ -19,7 +43,7 @@
         \hline
         {
             \vspace{0cm} % without it, bugs, don't know why?
-            \centerline{\includegraphics[width=\linewidth]{tp-ipp.png}}
+            \centerline{\includegraphics[width=\linewidth]{./images/tp-ipp.png}}
         }
          & {
                 \vspace{0cm} % same here
@@ -38,50 +62,30 @@
                 Mid-term Project Report
 
                 \vspace*{1cm}
-                %{\hfill\href{http://teaching.simplicitytheory.science}{teaching.simplicitytheory.science}}
         }    \\
         \hline
     \end{tabular}
 \end{center}
 
 \noindent Acronym of the Team: AWESome\\
-Name: Ardiansyah Nurgaha; Eddie Groh; Sriraam Appakutti; William Liaw
+Name: Ardiansyah Nurgaha; Eddie Groh; Sriraam Appakutti; William Liaw.
 
     {\centering\rule{\linewidth}{.5pt}}
 
-
-%\maketitle
 \begin{center}
     \section*{This is the title of my project}
 \end{center}
-\section*{Abstract}
 
-2/3 lines of abstract
+\input{doc/abstract}
 
-\section*{Problem Statement}
+\input{doc/problem}
 
-Explain which problem (and task) you're addressing.
-It should be framed as a problem (typically something desirable we want, or something undesirable we don't want, or something we don't understand, or something surprising).
+\input{doc/method}
 
-\section*{Method/Overall Architecture}
+\input{doc/experimentation}
 
-Description of your model
+\input{doc/discussion}
 
-\section*{Experimentation}
-
-\begin{itemize}
-    \item Dataset \& Dataset Statistics
-    \item Experimental Results based on Evaluation Metrics
-    \item Error Analysis
-\end{itemize}
-
-\section*{Discussion}
-
-Comparison with expectations, limitations, lessons learned, and perspectives.
-
-\section*{Bibliography}
-
-All useful references with links.
-
+\bibliography{main.bib}
 
 \end{document}
