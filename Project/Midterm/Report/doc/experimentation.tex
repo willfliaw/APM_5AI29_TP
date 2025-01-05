@@ -6,13 +6,14 @@
 %     \item Error Analysis
 % \end{itemize}
 
-This section outlines the dataset used for knowledge graph completion, presents the results of the experiments conducted using PyKEEN \textcolor{red}{and LLMs}, and includes an analysis of errors observed during model evaluation.
+This section outlines the dataset used for knowledge graph completion, presents the results of the experiments conducted using PyKEEN and LLMs. It also provides a comparison of the models' performance based on evaluation metrics such as Mean Reciprocal Rank (MRR), Hits@K, and Mean Rank (MR).
+% , and includes an analysis of errors observed during model evaluation.
 
 \subsection*{Dataset and Statistics}
 
-\todo{REVISIT AND ADAPT THIS SECTION IF WE DECIDE TO CONTINUE WORKING WITH THIS DATASET}
+% \todo{REVISIT AND ADAPT THIS SECTION IF WE DECIDE TO CONTINUE WORKING WITH THIS DATASET}
 
-The Hetionet dataset \cite{hetionet} serves as the initial foundation for this project, providing a structured biomedical knowledge graph that integrates data from various sources to represent relationships like \textit{treats}, \textit{binds}, and \textit{causes} between genes, compounds, diseases, and other biological entities. While Hetionet offers a diverse and well-documented schema, its role in this project is primarily exploratory. As we compare knowledge graph completion approaches using PyKEEN and large language models (LLMs), the dataset provides a valuable testbed for initial experiments. However, the suitability of Hetionet for future phases of the project remains under evaluation, and additional datasets may be considered as the scope of the task evolves.
+The Hetionet dataset \cite{hetionet} serves as the initial foundation for this project, providing a structured biomedical knowledge graph that integrates data from various sources to represent relationships like \textit{treats}, \textit{binds}, and \textit{causes} between genes, compounds, diseases, and other biological entities. While Hetionet offers a diverse and well-documented schema, its role in this project is primarily exploratory. As we compare knowledge graph completion approaches using PyKEEN and large language models (LLMs), the dataset provides a valuable testbed for initial experiments. However, the suitability of Hetionet for future phases of the project remains under evaluation, and additional datasets may be considered as the scope of the task evolves. 
 
 Key dataset statistics are summarized in Table~\ref{tab:dataset_stats}.
 
@@ -51,26 +52,34 @@ Evaluation is performed using standard link prediction metrics, including:
     \item \textbf{Mean Rank (MR)}: Provides the average rank of the correct entity. % The lower the better
 \end{itemize}
 
-The results are summarized in Table~\ref{tab:results}, comparing PyKEEN's models: RotatE\textcolor{red}{, ...}.
+The results are summarized in Table~\ref{tab:models_performance_comparison}, comparing several embedding models available on PyKEEN:
+\begin{itemize}
+    \item Custom models with LLM (Llama3.2:3b): RLM-A, RLM
+    \item Rotational models: RotatE
+    \item Translation models: TransE, TransH, TransR, TransD
+    \item Factorization models: RESCAL, TuckER, DistMult
+\end{itemize}
 
-\begin{table}[ht]
-    \centering
-    \caption{Experimental Results}
-    \begin{tabular}{l c c c}
-        \hline
-        \textbf{Model}                      & \textbf{MRR} & \textbf{Hits@10} & \textbf{MR} \\
-        \hline
-        RotatE                              & $0.050$      & $0.099$          & $1349.6$    \\ % Seemingly very poor results
-        \textcolor{red}{TEST OTHER MODELS?} & $...$        & $...$            & $...$       \\
-        \textcolor{red}{LLM (zero-shot)}    & $...$        & $...$            & $...$       \\
-        \textcolor{red}{LLM (few-shot)}     & $...$        & $...$            & $...$       \\
-        \textcolor{red}{LLM (RAG)}          & $...$        & $...$            & $...$       \\
-        \hline
-    \end{tabular}
-    \label{tab:results}
-\end{table}
 
-Predicted \textit{treats} relationships for L-Asparagine were visualized (Figure~\ref{fig:predicted_treats}) suggesting potential links to diseases such as melanoma, ulcerative colitis, and coronary disease. These predictions will require further validation to confirm biological plausibility. As illustrated in Figure~\ref{fig:kg_visualization}, the graph showcases relationships between the compound L-Asparagine and breast cancer, mediated by various genes. These indirect paths offer insights into potential mechanisms that could explain the model's predictions
+
+% \begin{table}[ht]
+%     \centering
+%     \caption{Experimental Results}
+%     \begin{tabular}{l c c c}
+%         \hline
+%         \textbf{Model}                      & \textbf{MRR} & \textbf{Hits@10} & \textbf{MR} \\
+%         \hline
+%         RotatE                              & $0.050$      & $0.099$          & $1349.6$    \\ % Seemingly very poor results
+%         \textcolor{red}{TEST OTHER MODELS?} & $...$        & $...$            & $...$       \\
+%         \textcolor{red}{LLM (zero-shot)}    & $...$        & $...$            & $...$       \\
+%         \textcolor{red}{LLM (few-shot)}     & $...$        & $...$            & $...$       \\
+%         \textcolor{red}{LLM (RAG)}          & $...$        & $...$            & $...$       \\
+%         \hline
+%     \end{tabular}
+%     \label{tab:results}
+% \end{table}
+
+Using RotatE model, predicted \textit{treats} relationships for L-Asparagine were visualized (Figure~\ref{fig:predicted_treats}) suggesting potential links to diseases such as melanoma, ulcerative colitis, and coronary disease. These predictions will require further validation to confirm biological plausibility. As illustrated in Figure~\ref{fig:kg_visualization}, the graph showcases relationships between the compound L-Asparagine and breast cancer, mediated by various genes. These indirect paths offer insights into potential mechanisms that could explain the model's predictions
 
 \begin{figure}[ht]
     \centering
@@ -86,19 +95,21 @@ Predicted \textit{treats} relationships for L-Asparagine were visualized (Figure
     \label{fig:predicted_treats}
 \end{figure}
 
-\subsection*{Error Analysis}
 
-\todo{COMPLETE THIS SECTION}
+\subsection*{Analysis}
+In general, the results indicate poor performance across all tested models for knowledge graph completion on the Hetionet dataset (subset). RotatE performs the best among the models tested, achieving the highest MRR (0.0643) and Hits@10 (0.1254), along with a competitive Mean Rank (1304.77). Meanwhile, translational models like TransE, TransH, TransR, and TransD generally perform poorly, likely due to simple geometric assumptions (linear or relational translations) that fail to capture complex patterns in the dataset. Semantic matching models, such as DistMult, RESCAL, and TuckER, also struggled, with RESCAL performing exceptionally poorly showed severe overfitting and scalability issues. 
 
-\subsection{Comparison LLM integration}
-\todo{Fix this mess}
+\textbf{Comparison with LLM integration (LLama3.2:3b)}. This custom models did not perform as well as expected (below RotatE standalone). Both Hits@10 are around 0.11, suggesting they capture relational patterns but may lack rotational expressiveness. Training losses can be seen in Figure \ref{fig:models_training_losses} and Figure \ref{tab:models_performance_comparison}.
 
-RLM-A: Llama3.2-3B provided with Wikidata entries to entities
-RLM: Llama3.2-3B embeddings
-RDE: Pipeline with random embeddings
-RotatE:
+% \subsection{Comparison LLM integration}
+% \todo{Fix this mess}
 
-Training losses can be seen in \ref{fig:models_training_losses} and \ref{tab:models_performance_comparison}
+% RLM-A: Llama3.2-3B provided with Wikidata entries to entities
+% RLM: Llama3.2-3B embeddings
+% RDE: Pipeline with random embeddings
+% RotatE:
+
+% Training losses can be seen in \ref{fig:models_training_losses} and \ref{tab:models_performance_comparison}
 
 % RLM-A:
 % Hits@1: 0.026036103396710104
@@ -132,6 +143,34 @@ Training losses can be seen in \ref{fig:models_training_losses} and \ref{tab:mod
 % Mean Rank: 1304.7662353515625
 % Mean Reciprocal Rank: 0.06425923109054565
 
+% {'TransE': {'hits@1': 0.0027415794345937478, 'hits@3': 0.013084810937833796, 'hits@5': 0.021692302214626504, 'hits@10': 0.039850815352844834, 'mean_rank': 1631.400146484375, 'mean_reciprocal_rank': 0.018126796931028366}, 
+% 'TransH': {'hits@1': 0.003578295236060671, 'hits@3': 0.009506515701773126, 'hits@5': 0.01468703268532365, 'hits@10': 0.02540411592964466, 'mean_rank': 2061.962646484375, 'mean_reciprocal_rank': 0.013518346473574638}, 
+% 'TransR': {'hits@1': 0.00152211066011536, 'hits@3': 0.004788862778608559, 'hits@5': 0.007904293954283274, 'hits@10': 0.015363526312041586, 'mean_rank': 2314.352294921875, 'mean_reciprocal_rank': 0.008869686163961887}, 
+% 'TransD': {'hits@1': 0.006622516556291391, 'hits@3': 0.018737093213700776, 'hits@5': 0.028110090436516414, 'hits@10': 0.046936195969522185, 'mean_rank': 1504.4407958984375, 'mean_reciprocal_rank': 0.02317844331264496}}
+% RESCAL
+% Hits@1: 0.0
+% Hits@3: 8.901231930499181e-06
+% Hits@5: 2.6703695791497543e-05
+% Hits@10: 0.00012461724702698854
+% Mean Rank: 9866.041015625 
+% Mean Reciprocal Rank: 0.00021927907073404637 
+
+% ### TuckER
+
+% Hits@1: 0.004290393790500605
+% Hits@3: 0.01131346578366446
+% Hits@5: 0.01763334045431888
+% Hits@10: 0.03096738588620665
+% Mean Rank: 2487.345703125
+% Mean Reciprocal Rank: 0.01583893597126007
+
+% DistMult
+% "hits_at_1": 0.00641778822188991,
+% "hits_at_3": 0.017401908424125898,
+% "hits_at_5": 0.025795770134586626,
+% "hits_at_10": 0.04272591326639607,
+% "mean_rank": 2570.988037109375,
+% "mean_reciprocal_rank": 0.02089608460664749,
 
 \begin{table}
 \centering
@@ -139,11 +178,20 @@ Training losses can be seen in \ref{fig:models_training_losses} and \ref{tab:mod
 \label{tab:models_performance_comparison}
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
-\textbf{Model} & \textbf{Hits@1} & \textbf{Hits@3} & \textbf{Hits@5} & \textbf{Hits@10} & \textbf{Mean Rank} & \textbf{Mean Reciprocal Rank} \\ \midrule
+\textbf{Model} & \textbf{Hits@1} & \textbf{Hits@3} & \textbf{Hits@5} & \textbf{Hits@10} & \textbf{Mean Rank} & \textbf{Mean Reciprocal Rank} \\ 
+\midrule
 RLM-A          & 0.0260          & 0.0564          & 0.0768          & 0.1141           & 1216.26            & 0.0577                        \\
 RLM            & 0.0258          & 0.0557          & 0.0763          & 0.1131           & \textbf{1199.26}   & 0.0573                        \\
 % RDE            & 0.0260          & 0.0564          & 0.0768          & 0.1141           & 1216.26            & 0.0577                        \\
-RotaE          & \textbf{0.0304} & \textbf{0.0650} & \textbf{0.0861} & \textbf{0.1254}  & 1304.77            & \textbf{0.0643}               \\ \bottomrule
+RotatE          & \textbf{0.0304} & \textbf{0.0650} & \textbf{0.0861} & \textbf{0.1254}  & 1304.77            & \textbf{0.0643}               \\ 
+TransE        & 0.0027          & 0.0131          & 0.0217          & 0.0399           & 1631.40            & 0.0181                        \\
+TransH        & 0.0036          & 0.0095          & 0.0147          & 0.0254           & 2061.96            & 0.0135                        \\
+TransR        & 0.0015          & 0.0048          & 0.0079          & 0.0154           & 2314.35            & 0.0089                        \\
+TransD        & 0.0066          & 0.0187          & 0.0281          & 0.0469           & 1504.44            & 0.0232                        \\
+RESCAL        & 0.0000          & 8.9e-6           & 2.7e-5          & 0.0001           & 9866.04            & 0.0002                        \\
+TuckER        & 0.0043          & 0.0113          & 0.0176          & 0.0310           & 2487.35            & 0.0158                        \\
+DistMult      & 0.0064          & 0.0174          & 0.0258          & 0.0427           & 2570.99            & 0.0209                        \\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -588,4 +636,4 @@ RotaE          & \textbf{0.0304} & \textbf{0.0650} & \textbf{0.0861} & \textbf{0
 \end{figure}
 
 
-To mitigate these errors, future work will explore: increasing the number of epochs and refining hyperparameters and incorporating negative sampling strategies to improve generalization.
+% To mitigate these errors, future work will explore: increasing the number of epochs and refining hyperparameters and incorporating negative sampling strategies to improve generalization.
