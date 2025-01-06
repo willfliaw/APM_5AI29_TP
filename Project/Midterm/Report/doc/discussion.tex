@@ -1,6 +1,15 @@
-\section*{Discussion}
+\section*{Future Work}
 
 % Comparison with expectations, limitations, lessons learned, and perspectives.
 
+In future work, we aim to enhance generalization by refining hyperparameters and employing more effective negative sampling strategies.
+The biomedical nature of Hetionet, with its heterogeneous relationships, suggests that more sophisticated models may be required to capture its underlying patterns effectively.
 
-To mitigate errors encountered, future work will explore refining hyperparameters and incorporating negative sampling strategies to improve generalization. Moreover, Hetionet contains biomedical data with heterogeneous relationships, which may require more complex models to capture the underlying patterns. We also recommend exploring integration with other families of models such as rule-based models (non-embedding methods like AnyBURL) if embeddings fail to capture biomedical patterns, pretrained and meta-learning models (BoxE) for modeling constraints in large datasets, CNN-based models (ConvE, R-GCN) for better capture local features effectively, or advanced models (HolE, AutoSF) for complex and heterogeneous dataset like Hetionet.
+LLMs like Llama are expected to perform better on datasets with broader everyday context, such as Wikidata Taxonomy.
+Exploring the applicability of such datasets could provide valuable insights into the limitations and strengths of LLM-based approaches.
+
+Additionally, integrating alternative model families could address challenges where embeddings alone fall short.
+Rule-based models like AnyBURL may offer better alignment with biomedical patterns.
+Pretrained and meta-learning models, such as BoxE, could help enforce constraints in large datasets.
+CNN-based models like ConvE and R-GCN are promising for capturing local features effectively, while advanced models such as HolE and AutoSF may better handle the complexity and heterogeneity of datasets like Hetionet.
+
