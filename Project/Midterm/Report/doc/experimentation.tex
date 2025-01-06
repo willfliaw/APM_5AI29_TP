@@ -54,7 +54,7 @@ The results are summarized in Table~\ref{tab:models_performance_comparison}, com
     \item Custom models with LLM embeddings: RLM-A, RLM;
     \item Rotational models: RotatE;
     \item Translation models: TransE, TransH, TransR, TransD;
-    \item Factorization models: RESCAL, TuckER, DistMult.
+    \item Semantic Matching models: RESCAL, TuckER, DistMult.
 \end{itemize}
 
 Using RotatE model, predicted \textit{treats} relationships for L-Asparagine were visualized (Figure~\ref{fig:predicted_treats}) suggesting potential links to diseases such as melanoma, ulcerative colitis, and coronary disease. These predictions will require further validation to confirm biological plausibility. As illustrated in Figure~\ref{fig:kg_visualization}, the graph showcases relationships between the compound L-Asparagine and breast cancer, mediated by various genes. These indirect paths offer insights into potential mechanisms that could explain the model's predictions
@@ -76,10 +76,13 @@ Using RotatE model, predicted \textit{treats} relationships for L-Asparagine wer
 \subsection*{Analysis}
 
 The results indicate poor performance across all models tested for knowledge graph completion on the Hetionet dataset.
-Among them, RotatE achieved the best results, with the highest MRR ($0.0643$) and Hits@10 ($0.1254$), along with a competitive MR ($1304.77$).
 
-Translational models generally underperformed, likely due to their simplistic geometric assumptions (linear or relational translations) that fail to capture complex biomedical patterns.
-Factorization models also struggled, with RESCAL performing particularly poorly, exhibiting severe overfitting and scalability issues.
+
+Among them, RotatE achieved the best results, with the highest MRR ($0.0643$) and Hits@10 ($0.1254$), along with a competitive MR ($1304.77$). The performance of RotatE can be attributed to its use of complex vector space rotations, which enable it to model symmetry, antisymmetry, inversion, and composition—properties that are crucial for representing the diverse and interconnected relationships found in biomedical datasets like Hetionet.
+
+In contrast, the translational models (TransE, TransH, TransR, and TransD) generally underperformed. These models rely on linear transformations (translations) to encode relationships between entities in vector space. While this approach works well for simple, hierarchical relationships, it struggles to handle the multi-relational complexity and semantic diversity present in biomedical knowledge graphs. For instance, TransE achieved an MRR of only 0.0181, and other translational models performed similarly poorly. Their inability to effectively model complex patterns suggests that they are not well-suited for tasks involving heterogeneous biomedical data.
+
+Moreover, the semantic matching models (DistMult, RESCAL, and TuckER) also yielded unsatisfactory results. These models emphasize similarity-based scoring through matrix factorization or tensor decomposition, which may fail to capture the structural dependencies present in Hetionet. Notably, RESCAL performed extremely poorly (MRR = 0.0002), likely due to overfitting caused by its high parameter complexity and a lack of regularization. TuckER, which is tensor-based, fared slightly better but still struggled to effectively utilize the dataset’s structural information, possibly due to insufficient embedding dimensions (128).
 
 Our models, RLM and RLM-A, performed below RotatE, with Hits@10 around $0.11$, indicating they capture relational patterns but lack the rotational expressiveness of RotatE.
 Although their mean rank is lower than RotatE, suggesting potential improvements in embedding quality, the addition of retrieval-augmented generation (RAG) did not yield further benefits.

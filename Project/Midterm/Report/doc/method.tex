@@ -2,11 +2,22 @@
 
 \subsection*{PyKEEN}
 
-PyKEEN \cite{pykeen} is an open-source Python library that facilitates training and evaluation of knowledge graph embedding models.
+PyKEEN~\cite{pykeen} is an open-source Python library that facilitates training and evaluation of knowledge graph embedding models.
 It streamlines the process of embedding entities and relations into continuous vector spaces, enabling efficient link prediction and relationship classification.
 PyKEEN supports a wide range of models, including TransE, RotatE, ComplEx, and DistMult, each with unique characteristics and performance profiles.
 
 In this project, PyKEEN was used to predict missing links within a knowledge graph through a structured workflow involving data extraction, preparation, model training, and link prediction.
+
+\subsection*{Knowledge Graph Embeddings for Link Prediction}
+
+In our experiments, we focused on two primary approaches for knowledge graph completion: traditional knowledge graph embedding models and LLM-based embeddings (detail in Section Model Evaluation). Among knowledge graph embedding models available in PyKEEN, in this first iteration we used several families of models starting from the simplest approaches.
+\begin{itemize}
+    \item \textbf{Translational Models (Distance-based)}: TransE~\cite{10.5555/2999792.2999923}, TransH~\cite{10.5555/2893873.2894046}, TransR~\cite{10.5555/2886521.2886624}, and TransD~\cite{ji-etal-2015-knowledge}.
+    This family of models embeds entities and relations in the same space, with the distance between head and tail entities reflecting the relationship. We used these simple models to see how they perform on Hetionet datasets.
+    \item \textbf{Rotational Models}: RotatE~\cite{sun2019rotateknowledgegraphembedding} is a rotational model that represents relations as rotations in the complex vector space. This model has shown state-of-the-art performance on several benchmark datasets.
+    \item \textbf{Semantic Matching Models (Tensor Factorization-based)}: DistMult~\cite{yang2015embeddingentitiesrelationslearning }, RESCAL~\cite{10.5555/3104482.3104584}, and TuckER~\cite{Balazevic_2019} are semantic matching models that capture complex interactions between entities and relations. These models are more expressive than translational models and have shown competitive performance on various datasets.
+\end{itemize}
+
 
 \subsection*{Neo4j Desktop}
 
@@ -72,7 +83,7 @@ Upon successful import, the schema can be visualized using the following Neo4j q
 The resulting graph, illustrates key entities and relationships that form the basis for multi-class link prediction and knowledge graph completion in subsequent tasks.
 
 \subsection*{Model Evaluation}
-
+\label{model-evaluation}
 We evaluated the performance of knowledge graph completion models, with a particular focus on comparing traditional embedding models with LLM-based embeddings.
 As our primary baseline, we used the RotatE model, configured with 128-dimensional embeddings and trained for 100 epochs with early stopping.
 While we explored several additional models, their performance was found to be subpar, and as such, we will not discuss them further.
