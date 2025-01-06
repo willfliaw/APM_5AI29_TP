@@ -2,15 +2,11 @@
 
 \subsection*{PyKEEN}
 
-% \todo{FURTHER EXPLAIN MODELS USED IN EXPERIMENTATION}
+PyKEEN \cite{pykeen} is an open-source Python library that facilitates training and evaluation of knowledge graph embedding models.
+It streamlines the process of embedding entities and relations into continuous vector spaces, enabling efficient link prediction and relationship classification.
+PyKEEN supports a wide range of models, including TransE, RotatE, ComplEx, and DistMult, each with unique characteristics and performance profiles.
 
-PyKEEN \cite{pykeen} is an open-source Python library that facilitates training and evaluation of knowledge graph embedding models. It streamlines the process of embedding entities and relations into continuous vector spaces, enabling efficient link prediction and relationship classification. PyKEEN supports a wide range of models, including TransE, RotatE, ComplEx, and DistMult, each with unique characteristics and performance profiles. 
-
-% \todo{COULD USE HYPERPARAMETER TUNING: INCREASE EPOCHS}
-
-In this project, PyKEEN was used to predict missing links within a knowledge graph through a structured workflow involving data extraction, preparation, model training, and link prediction. Triples $(h, r, t)$ representing head entities, relationships, and tail entities were first retrieved from the Neo4j database using Cypher queries (Listing~\ref{lst:cypher_query}). These triples were then converted into PyKEEN's \texttt{TriplesFactory} format to enable seamless integration with the PyKEEN pipeline. The RotatE algorithm was employed to train the embedding model over $20$ epochs with an embedding dimension of $128$. It's worth noting that $20$ epochs may be insufficient for meaningful training on large or complex graphs, especially with a high embedding dimensionality. Additionally, applying early stopping in this scenario is unlikely to yield significant improvements due to the limited number of epochs.
-
-Finally, the trained model was used to perform link prediction, identifying potential relationships within the knowledge graph.
+In this project, PyKEEN was used to predict missing links within a knowledge graph through a structured workflow involving data extraction, preparation, model training, and link prediction. Triples $(h, r, t)$ representing head entities, relationships, and tail entities were first retrieved from the Neo4j database using Cypher queries (Listing~\ref{lst:cypher_query}). These triples were then converted into PyKEEN's \texttt{TriplesFactory} format to enable seamless integration with the PyKEEN pipeline.
 
 \begin{lstlisting}[caption=Cypher query to retrieve triples., label=lst:cypher_query]
 MATCH (h)-[r]->(t)
@@ -25,7 +21,7 @@ Neo4j Desktop \cite{neo4j} serves as a crucial tool for managing and querying th
 
 This section provides a step-by-step guide to set up Neo4j Desktop and import a database dump file, as depicted in Figure~\ref{fig:neo4j-setup}. The specific dump used in this midterm report, derived from Hetionet, requires DBMS version $4.3$ to ensure compatibility.
 
-\begin{figure}[ht]
+\begin{figure}
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -67,11 +63,27 @@ This section provides a step-by-step guide to set up Neo4j Desktop and import a 
     \label{fig:neo4j-setup}
 \end{figure}
 
-Upon successful import, the schema can be visualized using the following Neo4j query: \texttt{CALL db.schema.visualization()}. The resulting graph, illustrates key entities and relationships that form the basis for multi-class link prediction and knowledge graph completion in subsequent tasks.
+Upon successful import, the schema can be visualized using the following Neo4j query: \texttt{CALL db.schema.visualization()}.
+The resulting graph, illustrates key entities and relationships that form the basis for multi-class link prediction and knowledge graph completion in subsequent tasks.
 
-\subsection*{Large Language Models}
+\subsection*{Evaluated Models}
 
-% \todo{SOMEONE STILL NEEDS TO IMPLEMENT IT AND CHANGE THIS SECTION}
-We integrate RotatE with Llama3.2:3b with Wikidata entries to entities (RLM-A) and RotatE Llama3.2:3b embeddings (RLM). 
+In this report, we evaluate the performance of knowledge graph completion models, with a particular focus on comparing the performance of traditional embedding models with LLM-based embeddings.
+As our primary baseline, we used the RotatE model, configured with 128-dimensional embeddings and trained for 100 epochs with early stopping.
+While we explored several additional models, their performance was found to be subpar, and as such, we will not discuss them further.
 
-Future work will involve adjusting and/or integrating other large language models (LLMs), exploring zero-shot, few-shot, and retrieval-augmented generation (RAG) techniques to enhance knowledge graph completion.
+For evaluating the performance of the LLM-based approaches, we selected the Llama 3.2-3B model.
+This model was chosen primarily for its competitive output quality while maintaining relatively low VRAM requirements.
+
+Based on the RotatE approach, we used a new architecture which combines 128 dimensions of conventional trainable embedding with 32 dimensions of projected LLM embeddings,
+created by a trainable linear layer which reduces the 3200 dimensional immutable LLM embedding.
+For creating the embeddings, we used two types of inputs.
+The first variant uses only the LLaMA embeddings generated from the label names, referred to as RLM.
+The second variant incorporates Wikidata’s Retrieval-Augmented Generation (RAG) technique, which we term RLM-A (RLM Augmented).
+These inputs are then tokenized in batches of 32, with a maximum sequence length of 128 tokens.
+These tokenized inputs are then passed through the Llama model, and the embeddings are derived from the final hidden layer.
+Specifically, the first token’s hidden state (similar to a [CLS] token) is selected to represent the input, resulting in a fixed-size vector for each label.
+These embeddings are stored in a pre-allocated tensor on the same device as the model, ensuring computational efficiency during processing.
+
+This approach leverages both the strengths of RotatE in learning relational embeddings and the capacity of Llama embeddings for representing complex label information,
+enhanced by additional knowledge from Wikidata entries in the RLM-A variant.

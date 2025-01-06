@@ -6,14 +6,21 @@
 %     \item Error Analysis
 % \end{itemize}
 
-This section outlines the dataset used for knowledge graph completion, presents the results of the experiments conducted using PyKEEN and LLMs. It also provides a comparison of the models' performance based on evaluation metrics such as Mean Reciprocal Rank (MRR), Hits@K, and Mean Rank (MR).
+This section outlines the dataset used for knowledge graph completion, presents the results of the experiments conducted using PyKEEN and LLMs.
+It also provides a comparison of the models' performance based on evaluation metrics such as Mean Reciprocal Rank (MRR), Hits@K, and Mean Rank (MR).
 % , and includes an analysis of errors observed during model evaluation.
 
 \subsection*{Dataset and Statistics}
 
 % \todo{REVISIT AND ADAPT THIS SECTION IF WE DECIDE TO CONTINUE WORKING WITH THIS DATASET}
 
-The Hetionet dataset \cite{hetionet} serves as the initial foundation for this project, providing a structured biomedical knowledge graph that integrates data from various sources to represent relationships like \textit{treats}, \textit{binds}, and \textit{causes} between genes, compounds, diseases, and other biological entities. While Hetionet offers a diverse and well-documented schema, its role in this project is primarily exploratory. As we compare knowledge graph completion approaches using PyKEEN and large language models (LLMs), the dataset provides a valuable testbed for initial experiments. However, the suitability of Hetionet for future phases of the project remains under evaluation, and additional datasets may be considered as the scope of the task evolves. 
+The Hetionet dataset~\cite{hetionet} serves as the initial foundation for this project, providing a structured biomedical knowledge graph
+that integrates data from various sources to represent relationships like \textit{treats}, \textit{binds}, and \textit{causes} between genes,
+compounds, diseases, and other biological entities.
+While Hetionet offers a diverse and well-documented schema, its role in this project is primarily exploratory.
+As we compare knowledge graph completion approaches using PyKEEN and large language models (LLMs), the dataset serves as a valuable testbed for initial experiments.
+However, Hetionet may present a worst-case scenario for LLM embeddings, as many compound names are rare in natural language datasets.
+Additionally, the augmentation data from Wikidata is often highly repetitive and consists mostly of basic factual information.
 
 Key dataset statistics are summarized in Table~\ref{tab:dataset_stats}.
 
@@ -35,14 +42,13 @@ Key dataset statistics are summarized in Table~\ref{tab:dataset_stats}.
 
 \subsection*{Experimental Results and Evaluation Metrics}
 
-To assess performance in predicting missing links using embedding models, the dataset is split into training ($80\%$), validation ($10\%$), and testing ($10\%$) sets. With this setup, as shown in Figure~\ref{fig:loss_plot}, PyKEEN's RotatE model's training loss decreases steadily, indicating successful optimization over the course of training.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.6\textwidth]{images/pykeen/losses.png}
-    \caption{Training loss plot for PyKEEN RotatE model over 20 epochs.}
-    \label{fig:loss_plot}
-\end{figure}
+To assess performance in predicting missing links using embedding models, the dataset is split into training ($80\%$), validation ($10\%$), and testing ($10\%$) sets.
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width=0.6\textwidth]{images/pykeen/losses.png}
+%     \caption{Training loss plot for PyKEEN RotatE model over 20 epochs.}
+%     \label{fig:loss_plot}
+% \end{figure}
 
 Evaluation is performed using standard link prediction metrics, including:
 
@@ -54,7 +60,7 @@ Evaluation is performed using standard link prediction metrics, including:
 
 The results are summarized in Table~\ref{tab:models_performance_comparison}, comparing several embedding models available on PyKEEN:
 \begin{itemize}
-    \item Custom models with LLM (Llama3.2:3b): RLM-A, RLM
+    \item Custom models with LLM (Llama3.2-3B): RLM-A, RLM
     \item Rotational models: RotatE
     \item Translation models: TransE, TransH, TransR, TransD
     \item Factorization models: RESCAL, TuckER, DistMult
@@ -83,23 +89,27 @@ Using RotatE model, predicted \textit{treats} relationships for L-Asparagine wer
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/pykeen/results.png}
+    \includegraphics[width=0.8\textwidth]{images/pykeen/results}
     \caption{Visualization of connections between L-Asparagine, genes, and breast cancer, highlighting predicted relationships.}
     \label{fig:kg_visualization}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/pykeen/predicted treats.png}
+    \includegraphics[width=0.45\textwidth]{images/pykeen/predicted treats}
     \caption{5 predicted \textit{treats} relationships for L-Asparagine.}
     \label{fig:predicted_treats}
 \end{figure}
 
 
 \subsection*{Analysis}
-In general, the results indicate poor performance across all tested models for knowledge graph completion on the Hetionet dataset (subset). RotatE performs the best among the models tested, achieving the highest MRR (0.0643) and Hits@10 (0.1254), along with a competitive Mean Rank (1304.77). Meanwhile, translational models like TransE, TransH, TransR, and TransD generally perform poorly, likely due to simple geometric assumptions (linear or relational translations) that fail to capture complex patterns in the dataset. Semantic matching models, such as DistMult, RESCAL, and TuckER, also struggled, with RESCAL performing exceptionally poorly showed severe overfitting and scalability issues. 
-
-\textbf{Comparison with LLM integration (LLama3.2:3b)}. This custom models did not perform as well as expected (below RotatE standalone). Both Hits@10 are around 0.11, suggesting they capture relational patterns but may lack rotational expressiveness. Training losses can be seen in Figure \ref{fig:models_training_losses} and Figure \ref{tab:models_performance_comparison}.
+In general, the results indicate poor performance across all tested models for knowledge graph completion on the Hetionet dataset.
+RotatE performs the best among the models tested, achieving the highest MRR (0.0643) and Hits@10 (0.1254), along with a competitive Mean Rank (1304.77).
+Meanwhile, translational models like TransE, TransH, TransR, and TransD generally perform poorly, likely due to simple geometric assumptions (linear or relational translations) that fail to capture complex patterns in the dataset. Semantic matching models, such as DistMult, RESCAL, and TuckER, also struggled, with RESCAL performing exceptionally poorly showed severe overfitting and scalability issues.
+Our models RLM and RLM-A did not perform very well (below RotatE standalone).
+Both Hits@10 are around 0.11, suggesting they capture relational patterns but may lack rotational expressiveness.
+Their mean rank is lower than RotatE, suggesting the embeddings could help, but the RAG does not seem to help further in this case.
+Training losses can be seen in Figure~\ref{fig:models_training_losses} and Figure~\ref{tab:models_performance_comparison}.
 
 % \subsection{Comparison LLM integration}
 % \todo{Fix this mess}
