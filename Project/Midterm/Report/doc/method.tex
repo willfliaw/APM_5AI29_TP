@@ -13,11 +13,10 @@ In this project, PyKEEN was used to predict missing links within a knowledge gra
 In our experiments, we focused on two primary approaches for knowledge graph completion: traditional knowledge graph embedding models and LLM-based embeddings (detail in Section Model Evaluation). Among knowledge graph embedding models available in PyKEEN, in this first iteration we used several families of models starting from the simplest approaches.
 \begin{itemize}
     \item \textbf{Translational Models (Distance-based)}: TransE~\cite{10.5555/2999792.2999923}, TransH~\cite{10.5555/2893873.2894046}, TransR~\cite{10.5555/2886521.2886624}, and TransD~\cite{ji-etal-2015-knowledge}.
-    This family of models embeds entities and relations in the same space, with the distance between head and tail entities reflecting the relationship. We used these simple models to see how they perform on Hetionet datasets.
+    This family of models embeds entities and relations in the same space, with the distance between head and tail entities reflecting the relationship.
     \item \textbf{Rotational Models}: RotatE~\cite{sun2019rotateknowledgegraphembedding} is a rotational model that represents relations as rotations in the complex vector space. This model has shown state-of-the-art performance on several benchmark datasets.
     \item \textbf{Semantic Matching Models (Tensor Factorization-based)}: DistMult~\cite{yang2015embeddingentitiesrelationslearning }, RESCAL~\cite{10.5555/3104482.3104584}, and TuckER~\cite{Balazevic_2019} are semantic matching models that capture complex interactions between entities and relations. These models are more expressive than translational models and have shown competitive performance on various datasets.
 \end{itemize}
-
 
 \subsection*{Neo4j Desktop}
 
