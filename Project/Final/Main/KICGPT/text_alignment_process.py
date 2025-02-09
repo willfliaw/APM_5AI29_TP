@@ -1,20 +1,24 @@
 ## clear the raw test description
 import argparse
-from collections import defaultdict
 import json
+from collections import defaultdict
+
 alignment_text = defaultdict(str)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset", type=str, default=None)
 args = parser.parse_args()
 
+
 def parse_description(str):
     description = str
     if "means" in str:
         description = str.split("means")[1].strip()
-        description = description.replace('A','[T]')
-        description = description.replace('B','[H]')
-    return description.strip("\"")
+        description = description.replace("A", "[T]")
+        description = description.replace("B", "[H]")
+    return description.strip('"')
+
+
 import simplejson
 
 relation_text_clean = defaultdict(str)
