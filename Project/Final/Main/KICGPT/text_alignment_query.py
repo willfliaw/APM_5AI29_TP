@@ -196,14 +196,14 @@ class Solver:
         self.log = []
 
     def load_ent_to_text(self):
-        with open("dataset/" + args.dataset + "/entity2text.txt", "r", encoding="utf8") as file:
+        with open("/Data/KICGPT/dataset/" + args.dataset + "/entity2text.txt", "r", encoding="utf8") as file:
             entity_lines = file.readlines()
             for line in entity_lines:
                 ent, text = line.strip().split("\t")
                 self.ent2text[ent] = text
 
     def load_rel_to_text(self):
-        with open("dataset/" + args.dataset + "/relation2text.txt", "r") as file:
+        with open("/Data/KICGPT/dataset/" + args.dataset + "/relation2text.txt", "r") as file:
             rel_lines = file.readlines()
             for line in rel_lines:
                 rel, text = line.strip().split("\t")
@@ -250,8 +250,8 @@ def main(args, demonstration_r, idx):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", default="wn18rr")
-    parser.add_argument("--output_path", default="./dataset/wn18rr/alignment/alignment_output.txt")
-    parser.add_argument("--chat_log_path", default="./dataset/wn18rr/alignment/alignment_chat.txt")
+    parser.add_argument("--output_path", default="/Data/KICGPT/dataset/wn18rr/alignment/alignment_output.txt")
+    parser.add_argument("--chat_log_path", default="/Data/KICGPT/dataset/wn18rr/alignment/alignment_chat.txt")
 
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--debug_online", action="store_true")
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     demonstration_r = defaultdict(list)
-    with open("dataset/" + args.dataset + "/demonstration/all_r_triples.txt", "r") as f:
+    with open("/Data/KICGPT/dataset/" + args.dataset + "/demonstration/all_r_triples.txt", "r") as f:
         demonstration_r = json.load(f)
 
     if args.num_process == 1:

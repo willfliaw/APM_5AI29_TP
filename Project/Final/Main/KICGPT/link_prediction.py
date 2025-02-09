@@ -7,8 +7,9 @@ import re
 import time
 
 import tiktoken
-from prompt_selection import Demon_sampler
 from tqdm import tqdm
+
+from prompt_selection import Demon_sampler
 
 
 class ChatGPT:
@@ -343,24 +344,24 @@ class Solver:
 
     def load_all_candidate_answers(self):
         with open(
-            "dataset/" + self.args.dataset + "/retriever_candidate_" + args.query + ".txt",
+            "/Data/KICGPT/dataset/" + self.args.dataset + "/retriever_candidate_" + args.query + ".txt",
             "r",
         ) as load_f:
             self.all_candidate_answers = json.load(load_f)
 
     def load_align_text(self):
-        with open("dataset/" + self.args.dataset + "/alignment/alignment_clean.txt", "r") as load_f:
+        with open("/Data/KICGPT/dataset/" + self.args.dataset + "/alignment/alignment_clean.txt", "r") as load_f:
             self.align_text = json.load(load_f)
 
     def load_rel_txt_to_id(self):
-        with open("dataset/" + self.args.dataset + "/get_neighbor/relation2id.txt", "r") as file:
+        with open("/Data/KICGPT/dataset/" + self.args.dataset + "/get_neighbor/relation2id.txt", "r") as file:
             relation_lines = file.readlines()
             for line in relation_lines:
                 _name, _id = line.strip().split("\t")
                 self.rel2id[_name] = _id
 
     def load_ent_map_id(self):
-        with open("dataset/" + self.args.dataset + "/get_neighbor/entity2id.txt", "r") as file:
+        with open("/Data/KICGPT/dataset/" + self.args.dataset + "/get_neighbor/entity2id.txt", "r") as file:
             entity_lines = file.readlines()
             for line in entity_lines:
                 _name, _id = line.strip().split("\t")
@@ -368,7 +369,7 @@ class Solver:
                 self.id2ent[_id] = _name
 
     def load_ent_to_text(self):
-        with open("dataset/" + self.args.dataset + "/entity2text.txt", "r") as file:
+        with open("/Data/KICGPT/dataset/" + self.args.dataset + "/entity2text.txt", "r") as file:
             entity_lines = file.readlines()
             for line in entity_lines:
                 ent, text = line.strip().split("\t")
@@ -469,7 +470,7 @@ if __name__ == "__main__":
             assert len(all_keys) == args.num_process, (len(all_keys), args.num_process)
     test_triplet = []
 
-    with open("dataset/" + args.dataset + "/test_answer.txt", "r") as load_f:
+    with open("/Data/KICGPT/dataset/" + args.dataset + "/test_answer.txt", "r") as load_f:
         test_triplet = json.load(load_f)
     print("Totally %d test examples." % len(test_triplet))
 

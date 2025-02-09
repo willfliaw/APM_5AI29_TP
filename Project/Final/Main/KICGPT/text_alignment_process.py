@@ -22,12 +22,12 @@ def parse_description(str):
 import simplejson
 
 relation_text_clean = defaultdict(str)
-with open("dataset/" + args.dataset + "/alignment/alignment_output.txt", "r") as f:
+with open("/Data/KICGPT/dataset/" + args.dataset + "/alignment/alignment_output.txt", "r") as f:
     lines = f.readlines()
     for line in lines:
         alignment_text = simplejson.loads(line)
         relation_text_clean[alignment_text["Raw"]] = parse_description(alignment_text["Description"])
 
 
-with open("dataset/" + args.dataset + "/alignment/alignment_clean.txt", "w") as f:
+with open("/Data/KICGPT/dataset/" + args.dataset + "/alignment/alignment_clean.txt", "w") as f:
     f.write(json.dumps(relation_text_clean, indent=1))

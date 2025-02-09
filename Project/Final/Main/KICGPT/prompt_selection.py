@@ -28,13 +28,13 @@ class Demon_sampler:
 
     def load_demonstration(self):
         with open(
-            "dataset/" + self.dataset + "/demonstration/" + self.args.query + "_supplement.txt",
+            "/Data/KICGPT/dataset/" + self.dataset + "/demonstration/" + self.args.query + "_supplement.txt",
             "r",
         ) as f:
             supplement_pool = json.load(f)
 
         with open(
-            "dataset/" + self.dataset + "/demonstration/" + self.args.query + "_analogy.txt",
+            "/Data/KICGPT/dataset/" + self.dataset + "/demonstration/" + self.args.query + "_analogy.txt",
             "r",
         ) as f:
             analogy_pool = json.load(f)
@@ -136,7 +136,7 @@ class Demon_sampler:
 
     def shrink_link_base(self):
         with open(
-            "dataset/" + self.dataset + "/demonstration/" + "T_link_base_" + self.args.query + ".txt",
+            "/Data/KICGPT/dataset/" + self.dataset + "/demonstration/" + "T_link_base_" + self.args.query + ".txt",
             "r",
         ) as f:
             self.link_base = json.load(f)
@@ -155,7 +155,7 @@ class Demon_sampler:
             self.T_link_base[key] = [h_text, r, enetity_link_base]
 
     def load_ent_to_text(self):
-        with open("dataset/" + self.dataset + "/entity2text.txt", "r") as file:
+        with open("/Data/KICGPT/dataset/" + self.dataset + "/entity2text.txt", "r") as file:
             entity_lines = file.readlines()
             for line in entity_lines:
                 ent, text = line.strip().split("\t")

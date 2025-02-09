@@ -11,30 +11,30 @@ args = parser.parse_args()
 dataset = args.dataset
 
 id2entity_name = defaultdict(str)
-with open("dataset/" + dataset + "/get_neighbor/entity2id.txt", "r") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/get_neighbor/entity2id.txt", "r") as file:
     entity_lines = file.readlines()
     for line in entity_lines:
         _name, _id = line.strip().split("\t")
         id2entity_name[int(_id)] = _name
 
 id2relation_name = defaultdict(str)
-with open("dataset/" + dataset + "/get_neighbor/relation2id.txt", "r") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/get_neighbor/relation2id.txt", "r") as file:
     relation_lines = file.readlines()
     for line in relation_lines:
         _name, _id = line.strip().split("\t")
         id2relation_name[int(_id)] = _name
 
 train_triplet = []
-for line in open("dataset/" + dataset + "/get_neighbor/train2id.txt", "r"):
+for line in open("/Data/KICGPT/dataset/" + dataset + "/get_neighbor/train2id.txt", "r"):
     head, relation, tail = line.strip("\n").split()
     train_triplet.append(list((int(head), int(relation), int(tail))))
 
-for line in open("dataset/" + dataset + "/get_neighbor/valid2id.txt", "r"):
+for line in open("/Data/KICGPT/dataset/" + dataset + "/get_neighbor/valid2id.txt", "r"):
     head, relation, tail = line.strip("\n").split()
     train_triplet.append(list((int(head), int(relation), int(tail))))
 
 test_triplet = []
-for line in open("dataset/" + dataset + "/get_neighbor/test2id.txt", "r"):
+for line in open("/Data/KICGPT/dataset/" + dataset + "/get_neighbor/test2id.txt", "r"):
     head, relation, tail = line.strip("\n").split()
     test_triplet.append(list((int(head), int(relation), int(tail))))
 
@@ -228,36 +228,36 @@ for key in id2relation_name:
 
 
 # Demonstration Pools
-with open("dataset/" + dataset + "/demonstration/tail_supplement.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/tail_supplement.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_h, indent=1))
 
-with open("dataset/" + dataset + "/demonstration/head_supplement.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/head_supplement.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_t, indent=1))
 
-with open("dataset/" + dataset + "/demonstration/tail_analogy.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/tail_analogy.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_r_query_tail, indent=1))
 
-with open("dataset/" + dataset + "/demonstration/head_analogy.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/head_analogy.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_r_query_head, indent=1))
 
 
 # Other support files
-with open("dataset/" + dataset + "/demonstration/T_link_base_head.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/T_link_base_head.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_link_base_head, indent=1))
 
-with open("dataset/" + dataset + "/demonstration/T_link_base_tail.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/T_link_base_tail.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_link_base_tail, indent=1))
 
-with open("dataset/" + dataset + "/demonstration/all_r_triples.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/demonstration/all_r_triples.txt", "w") as file:
     file.write(json.dumps(all_r_triples, indent=1))
 
-with open("dataset/" + dataset + "/link_base_id_tail.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/link_base_id_tail.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_link_base_id_tail, indent=1))
 
-with open("dataset/" + dataset + "/link_base_id_head.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/link_base_id_head.txt", "w") as file:
     file.write(json.dumps(demonstrations_T_link_base_id_head, indent=1))
 
-with open("dataset/" + dataset + "/test_answer.txt", "w") as file:
+with open("/Data/KICGPT/dataset/" + dataset + "/test_answer.txt", "w") as file:
     file.write(json.dumps(test_questions, indent=1))
 
 
@@ -280,7 +280,7 @@ for triplet in test_triplet:
     all_answer_tail["\t".join([head_, relation_])] = all_answer_tail_raw["\t".join([head_, relation_])]
     all_answer_head["\t".join([tail_, relation_])] = all_answer_head_raw["\t".join([tail_, relation_])]
 
-with open("dataset/" + dataset + "/filter_head.txt", "w") as load_f:
+with open("/Data/KICGPT/dataset/" + dataset + "/filter_head.txt", "w") as load_f:
     load_f.write(json.dumps(all_answer_head, indent=1))
-with open("dataset/" + dataset + "/filter_tail.txt", "w") as load_f:
+with open("/Data/KICGPT/dataset/" + dataset + "/filter_tail.txt", "w") as load_f:
     load_f.write(json.dumps(all_answer_tail, indent=1))
