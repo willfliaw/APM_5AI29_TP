@@ -63,8 +63,8 @@ class ChatGPT:
             do_sample=False,
             temperature=0,
             top_p=1,
-            eos_token_id=tokenizer.eos_token_id,
-            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id,
         )
 
     def get_response(self, input_text, turn_type):
@@ -96,7 +96,7 @@ class ChatGPT:
 
     def generate_answer(self, turns):
         # Tokenize turns.
-        input_ids = tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
+        input_ids = self.tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
 
         # Ensure we don't use gradient to save memory space and computation time.
         with torch.no_grad():
@@ -105,12 +105,12 @@ class ChatGPT:
         # Recover and decode answer.
         answer_tokens = outputs[0, input_ids.shape[1] : -1]
 
-        return tokenizer.decode(answer_tokens).strip()
+        return self.tokenizer.decode(answer_tokens).strip()
 
     def query_API_to_get_message(self, messages):
         while True:
             try:
-                res = generate_answer(messages)
+                res = self.generate_answer(messages)
                 if args.debug_online:
                     print(res)
                 return res
@@ -229,10 +229,8 @@ def main(args, demonstration_r, idx):
                     r = key
                     triples = random.sample(demonstration_r[r], args.demon_per_r)
                     clean_relation, chat_history = solver.forward(r, triples)
-                except openai.error.InvalidRequestError as e:
-                    print(e)
-                    continue
                 except Exception as e:
+                    print(e)
                     logging.exception(e)
                     continue
 

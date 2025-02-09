@@ -5,11 +5,28 @@ import multiprocessing as mp
 import os
 import re
 import time
+from collections import defaultdict
 
 import tiktoken
-from tqdm import tqdm
-
+import torch
 from prompt_selection import Demon_sampler
+from tqdm import tqdm
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig, GenerationConfig)
+
+
+def read_hf_token(file_path):
+    """Reads the Hugging Face token from a file."""
+    try:
+        with open(file_path, "r") as file:
+            token = file.read().strip()
+            if not token:
+                raise ValueError("The token file is empty.")
+            return token
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Token file not found at: {file_path}")
+    except Exception as e:
+        raise RuntimeError(f"An error occurred while reading the token: {e}")
 
 
 class ChatGPT:
@@ -51,8 +68,8 @@ class ChatGPT:
             do_sample=False,
             temperature=0,
             top_p=1,
-            eos_token_id=tokenizer.eos_token_id,
-            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id,
         )
 
     def get_response(self, input_text, turn_type):
@@ -113,7 +130,7 @@ class ChatGPT:
 
     def generate_answer(self, turns):
         # Tokenize turns.
-        input_ids = tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
+        input_ids = self.tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
 
         # Ensure we don't use gradient to save memory space and computation time.
         with torch.no_grad():
@@ -122,12 +139,12 @@ class ChatGPT:
         # Recover and decode answer.
         answer_tokens = outputs[0, input_ids.shape[1] : -1]
 
-        return tokenizer.decode(answer_tokens).strip()
+        return self.tokenizer.decode(answer_tokens).strip()
 
     def query_API_to_get_message(self, messages):
         while True:
             try:
-                res = generate_answer(messages)
+                res = self.generate_answer(messages)
                 if args.debug_online:
                     print(res)
                 return res

@@ -8,11 +8,24 @@ import time
 from collections import defaultdict
 
 import torch
+from prompt_selection import Demon_sampler
 from tqdm import tqdm
 from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           BitsAndBytesConfig, GenerationConfig)
 
-from prompt_selection import Demon_sampler
+
+def read_hf_token(file_path):
+    """Reads the Hugging Face token from a file."""
+    try:
+        with open(file_path, "r") as file:
+            token = file.read().strip()
+            if not token:
+                raise ValueError("The token file is empty.")
+            return token
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Token file not found at: {file_path}")
+    except Exception as e:
+        raise RuntimeError(f"An error occurred while reading the token: {e}")
 
 
 class ChatGPT:
@@ -54,8 +67,8 @@ class ChatGPT:
             do_sample=False,
             temperature=0,
             top_p=1,
-            eos_token_id=tokenizer.eos_token_id,
-            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id,
         )
 
     def get_response(self, input_text, turn_type):
