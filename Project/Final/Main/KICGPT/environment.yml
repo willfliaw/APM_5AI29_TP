@@ -1,0 +1,30 @@
+name: ml-torch
+channels:
+  - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - ipykernel
+  - jupyter
+  - matplotlib
+  - numpy
+  - pandas
+  - python
+  - pytorch
+  - pytorch-cuda=12.4
+  - scikit-image
+  - scikit-learn
+  - scipy
+  - torchaudio
+  - torchvision
+  - tqdm
+  - huggingface_hub
+  - gensim
+  - simplejson
+  - pip:
+      - accelerate==1.2.1
+      - bitsandbytes==0.45.0
+      - gensim==3.8.2
+      - huggingface-hub==0.27.0
+      - scipy==1.12.0
+      - transformers==4.47.1
