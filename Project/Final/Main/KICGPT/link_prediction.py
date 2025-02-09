@@ -139,7 +139,7 @@ class ChatGPT:
         # Recover and decode answer.
         answer_tokens = outputs[0, input_ids.shape[1] : -1]
 
-        return self.tokenizer.decode(answer_tokens).strip()
+        return {"role": "assistant", "content": self.tokenizer.decode(answer_tokens).strip()}
 
     def query_API_to_get_message(self, messages):
         while True:
