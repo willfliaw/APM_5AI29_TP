@@ -118,7 +118,7 @@ class ChatGPT:
 
     def generate_answer(self, turns):
         # Tokenize turns.
-        input_ids = tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
+        input_ids = self.tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
 
         # Ensure we don't use gradient to save memory space and computation time.
         with torch.no_grad():
@@ -129,12 +129,12 @@ class ChatGPT:
 
         self.token_num = outputs.sequences.shape[1] - input_ids.shape[1]
 
-        return tokenizer.decode(answer_tokens).strip()
+        return self.tokenizer.decode(answer_tokens).strip()
 
     def query_API_to_get_message(self, messages):
         while True:
             try:
-                res = generate_answer(messages)
+                res = self.generate_answer(messages)
                 if args.debug_online:
                     print(res)
                 return res
@@ -349,7 +349,6 @@ class Solver:
 
 
 def main(args, all_data, idx, api_key):
-    openai.api_key = api_key
     if idx == -1:
         output_path = args.output_path
         chat_log_path = args.chat_log_path

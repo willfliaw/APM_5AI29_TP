@@ -203,12 +203,19 @@ class Solver:
                 self.ent2text[ent] = text
 
     def load_rel_to_text(self):
-        with open("/Data/KICGPT/dataset/" + args.dataset + "/relation2text.txt", "r") as file:
-            rel_lines = file.readlines()
-            for line in rel_lines:
-                rel, text = line.strip().split("\t")
-                self.rel2text[rel] = text
+        with open("/Data/KICGPT/dataset/" + args.dataset + "/relation2text.txt", "r", encoding="utf-8") as file:
+            first_char = file.read(1)
+            file.seek(0)  # Reset file pointer to beginning
 
+            if first_char == "{":  # Likely a JSON file
+                rel2text = json.load(file)
+                for rel, text in rel2text.items():
+                    self.rel2text[rel] = text
+            else:  # Assume it's TSV
+                rel_lines = file.readlines()
+                for line in rel_lines:
+                    rel, text = line.strip().split("\t")
+                    self.rel2text[rel] = text
 
 def main(args, demonstration_r, idx):
     if idx == -1:
