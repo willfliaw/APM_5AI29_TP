@@ -348,7 +348,7 @@ class Solver:
                 self.text2ent[text] = ent
 
 
-def main(args, all_data, idx, api_key):
+def main(args, all_data, idx):
     if idx == -1:
         output_path = args.output_path
         chat_log_path = args.chat_log_path
@@ -437,11 +437,7 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    if not args.api_key.startswith("sk-"):
-        with open(args.api_key, "r") as f:
-            all_keys = f.readlines()
-            all_keys = [line.strip("\n") for line in all_keys]
-            assert len(all_keys) == args.num_process, (len(all_keys), args.num_process)
+
     test_triplet = []
 
     with open("/Data/KICGPT/dataset/" + args.dataset + "/test_answer.txt", "r") as load_f:
@@ -451,7 +447,7 @@ if __name__ == "__main__":
     if args.debug_online:
         test_triplet = test_triplet[0 : 2 * args.num_process]
     if args.num_process == 1:
-        main(args, test_triplet, idx=-1, api_key=args.api_key)
+        main(args, test_triplet, idx=-1)
     else:
         num_each_split = int(len(test_triplet) / args.num_process)
         p = mp.Pool(args.num_process)
@@ -463,7 +459,7 @@ if __name__ == "__main__":
                 end = (idx + 1) * num_each_split
             split_data = test_triplet[start:end]
             try:
-                p.apply_async(main, args=(args, split_data, idx, all_keys[idx]))
+                p.apply_async(main, args=(args, split_data, idx))
             except Exception as e:
                 logging.exception(e)
 
