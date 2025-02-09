@@ -7,7 +7,6 @@ import re
 import time
 from collections import defaultdict
 
-import tiktoken
 import torch
 from prompt_selection import Demon_sampler
 from tqdm import tqdm
@@ -201,8 +200,7 @@ class Solver:
             self.load_align_text()
 
     def count_token(self, string):
-        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo-0613")
-        return len(encoding.encode(string))
+        return len(self.LLM.tokenizer(string)["input_ids"])
 
     def forward(self, question, tpe):  # Here tpe_id not a int id, but like '/m/08966'
         self.LLM.reset_history()
