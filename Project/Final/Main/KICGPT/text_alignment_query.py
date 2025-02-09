@@ -2,10 +2,27 @@ import argparse
 import json
 import logging
 import os
+import random
 import time
 from collections import defaultdict
 
-import openai
+import torch
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig, GenerationConfig)
+
+
+def read_hf_token(file_path):
+    """Reads the Hugging Face token from a file."""
+    try:
+        with open(file_path, "r") as file:
+            token = file.read().strip()
+            if not token:
+                raise ValueError("The token file is empty.")
+            return token
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Token file not found at: {file_path}")
+    except Exception as e:
+        raise RuntimeError(f"An error occurred while reading the token: {e}")
 
 
 class ChatGPT:
@@ -15,7 +32,40 @@ class ChatGPT:
         self.history_contents = []
         self.max_tokens = max_tokens
         self.prompt = self.load_prompt_template(prompt_path, prompt_name)
-        self.token_num = 0
+
+        hf_token_file = "token.txt"
+
+        # Read the token from the file
+        hf_token = read_hf_token(hf_token_file)
+        llm_name = "mistralai/Ministral-8B-Instruct-2410"
+
+        # We want to use 4bit quantization to save memory
+        quantization_config = BitsAndBytesConfig(load_in_8bit=False, load_in_4bit=True)
+
+        # Load tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(llm_name, padding_side="left", token=hf_token, cache_dir="/Data/KICGPT/llm")
+        self.tokenizer.use_default_system_prompt = False
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+
+        # Load LLM.
+        self.llm = AutoModelForCausalLM.from_pretrained(
+            llm_name,
+            quantization_config=quantization_config,
+            device_map={"": 0},  # load all the model layers on GPU 0
+            torch_dtype=torch.bfloat16,  # float precision
+            token=hf_token,
+            cache_dir="/Data/KICGPT/llm",
+        )
+        self.llm.eval()
+
+        self.generation_config = GenerationConfig(
+            max_new_tokens=self.max_tokens,
+            do_sample=False,
+            temperature=0,
+            top_p=1,
+            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.pad_token_id,
+        )
 
     def get_response(self, input_text, turn_type):
         if self.args.debug:
@@ -44,42 +94,33 @@ class ChatGPT:
         message = {"role": "user", "content": input_text}
         return message
 
+    def generate_answer(self, turns):
+        # Tokenize turns.
+        input_ids = tokenizer.apply_chat_template(turns, return_tensors="pt").to("cuda")
+
+        # Ensure we don't use gradient to save memory space and computation time.
+        with torch.no_grad():
+            outputs = self.llm.generate(input_ids, self.generation_config)
+
+        # Recover and decode answer.
+        answer_tokens = outputs[0, input_ids.shape[1] : -1]
+
+        return tokenizer.decode(answer_tokens).strip()
+
     def query_API_to_get_message(self, messages):
         while True:
             try:
-                res = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=messages,
-                    temperature=0,
-                    max_tokens=self.max_tokens,
-                    top_p=1,
-                    frequency_penalty=0,
-                    presence_penalty=0,
-                )
+                res = generate_answer(messages)
                 if args.debug_online:
                     print(res)
-                self.token_num = res["usage"]["total_tokens"]
-                return res["choices"][0]["message"]
-            except openai.error.RateLimitError:
-                print("openai.error.RateLimitError\nRetrying...")
-                time.sleep(30)
-            except openai.error.ServiceUnavailableError:
-                print("openai.error.ServiceUnavailableError\nRetrying...")
-                time.sleep(20)
-            except openai.error.Timeout:
-                print("openai.error.Timeout\nRetrying...")
-                time.sleep(20)
-            except openai.error.APIError:
-                print("openai.error.APIError\nRetrying...")
-                time.sleep(20)
-            except openai.error.APIConnectionError:
-                print("openai.error.APIConnectionError\nRetrying...")
+                return res
+            except Exception as e:
+                print(f"An exception occurred: {e}")
                 time.sleep(20)
 
     def reset_history(self):
         self.history_messages = []
         self.history_contents = []
-        self.token_num = 0
 
     def reset_history_messages(self):
         self.history_messages = []
@@ -155,7 +196,7 @@ class Solver:
         self.log = []
 
     def load_ent_to_text(self):
-        with open("dataset/" + args.dataset + "/entity2text.txt", "r") as file:
+        with open("dataset/" + args.dataset + "/entity2text.txt", "r", encoding="utf8") as file:
             entity_lines = file.readlines()
             for line in entity_lines:
                 ent, text = line.strip().split("\t")
@@ -169,12 +210,7 @@ class Solver:
                 self.rel2text[rel] = text
 
 
-def main(args, demonstration_r, idx, api_key):
-    from collections import defaultdict
-
-    import openai
-
-    openai.api_key = api_key
+def main(args, demonstration_r, idx):
     if idx == -1:
         output_path = args.output_path
         chat_log_path = args.chat_log_path
@@ -185,8 +221,6 @@ def main(args, demonstration_r, idx, api_key):
 
     print("Start PID %d and save to %s" % (os.getpid(), chat_log_path))
     solver = Solver(args)
-
-    import random
 
     with open(output_path, "w") as f:
         with open(chat_log_path, "w") as fclog:
@@ -224,18 +258,11 @@ def parse_args():
 
     parser.add_argument("--max_tokens", default=300, type=int, help="max-token")
     parser.add_argument("--prompt_path", default="./prompts/text_alignment.json")
-    parser.add_argument(
-        "--prompt_name",
-        default="chat",
-    )
-    parser.add_argument(
-        "--bagging_type",
-        default="llm",
-    )
+    parser.add_argument("--prompt_name", default="chat")
+    parser.add_argument("--bagging_type", default="llm")
 
     parser.add_argument("--device", default=0, help="the gpu device")
 
-    parser.add_argument("--api_key", default="", type=str)
     parser.add_argument("--demon_per_r", default=30)
     parser.add_argument("--num_process", default=1, type=int, help="the number of multi-process")
 
@@ -247,17 +274,12 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    if not args.api_key.startswith("sk-"):
-        with open(args.api_key, "r") as f:
-            all_keys = f.readlines()
-            all_keys = [line.strip("\n") for line in all_keys]
-            assert len(all_keys) == args.num_process, (len(all_keys), args.num_process)
 
     demonstration_r = defaultdict(list)
     with open("dataset/" + args.dataset + "/demonstration/all_r_triples.txt", "r") as f:
         demonstration_r = json.load(f)
 
     if args.num_process == 1:
-        main(args, demonstration_r, idx=-1, api_key=args.api_key)
+        main(args, demonstration_r, idx=-1)
     else:
         pass
