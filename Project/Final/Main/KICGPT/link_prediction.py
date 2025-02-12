@@ -5,6 +5,7 @@ import multiprocessing as mp
 import os
 import re
 import time
+import traceback
 from collections import defaultdict
 
 import torch
@@ -25,6 +26,7 @@ def read_hf_token(file_path):
     except FileNotFoundError:
         raise FileNotFoundError(f"Token file not found at: {file_path}")
     except Exception as e:
+        logging.exception(e)
         raise RuntimeError(f"An error occurred while reading the token: {e}")
 
 
@@ -46,6 +48,9 @@ class ChatGPT:
         # We want to use 4bit quantization to save memory
         quantization_config = BitsAndBytesConfig(load_in_8bit=False, load_in_4bit=True)
 
+        # Consider adding these optimizations:
+        torch.backends.cudnn.benchmark = True  # If input sizes are consistent
+
         # Load tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(llm_name, padding_side="left", token=hf_token, cache_dir="/Data/KICGPT/llm")
         self.tokenizer.use_default_system_prompt = False
@@ -65,7 +70,7 @@ class ChatGPT:
         self.generation_config = GenerationConfig(
             max_new_tokens=self.max_tokens,
             do_sample=False,
-            temperature=0,
+            # temperature=0,
             top_p=1,
             eos_token_id=self.tokenizer.eos_token_id,
             pad_token_id=self.tokenizer.pad_token_id,
@@ -145,10 +150,12 @@ class ChatGPT:
             try:
                 res = self.generate_answer(messages)
                 if args.debug_online:
+                    print(messages)
                     print(res)
                 return res
             except Exception as e:
                 print(f"An error occurred: {e}")
+                logging.exception(e)
                 time.sleep(20)
 
     def reset_history(self):
@@ -438,11 +445,13 @@ def main(args, all_data, idx):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", default="fb15k-237")
+    # parser.add_argument("--dataset", default="fb15k-237")
+    parser.add_argument("--dataset", default="wn18rr")
+
     parser.add_argument("--candidate_num", default=50, type=int)
-    parser.add_argument("--output_path", default="./outputs/fb15k-237/output_tail.txt")
-    parser.add_argument("--chat_log_path", default="./outputs/fb15k-237/chat_tail.txt")
-    parser.add_argument("--query", default="tail", required=True)
+    parser.add_argument("--output_path", default="./outputs/wn18rr/output_tail.txt")
+    parser.add_argument("--chat_log_path", default="./outputs/wn18rr/chat_tail.txt")
+    parser.add_argument("--query", default="tail", required=False)
     parser.add_argument("--model_path", default=None)
 
     parser.add_argument("--debug", action="store_true")
@@ -479,6 +488,10 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    # Manual args setting
+    args.debug_online = True
+    args.query = "tail"
+
     test_triplet = []
 
     with open("/Data/KICGPT/dataset/" + args.dataset + "/test_answer.txt", "r") as load_f:
@@ -509,8 +522,6 @@ if __name__ == "__main__":
         print("All of the child processes over!")
 
 # Debug:
-#       python3 link_prediction.py --dataset fb15k-237   --debug --query tail
-#       python3 link_prediction.py --dataset fb15k-237   --debug --query head
 #       python3 link_prediction.py --dataset fb15k-237   --debug --query tail
 #       python3 link_prediction.py --dataset fb15k-237   --debug --query head
 # debug_online:

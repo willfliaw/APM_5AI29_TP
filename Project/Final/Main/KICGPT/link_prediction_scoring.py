@@ -65,10 +65,11 @@ class ChatGPT:
         self.generation_config = GenerationConfig(
             max_new_tokens=self.max_tokens,
             do_sample=False,
-            temperature=0,
-            top_p=1,
+            # temperature=0,
+            # top_p=1,
             eos_token_id=self.tokenizer.eos_token_id,
             pad_token_id=self.tokenizer.pad_token_id,
+            return_dict_in_generate=True,
         )
 
     def get_response(self, input_text, turn_type):
@@ -124,12 +125,15 @@ class ChatGPT:
         with torch.no_grad():
             outputs = self.llm.generate(input_ids, self.generation_config)
 
+        # Extract generated sequences (safe because return_dict_in_generate=True)
+        sequences = outputs["sequences"]
+
         # Recover and decode answer.
-        answer_tokens = outputs[0, input_ids.shape[1] : -1]
+        generated_tokens = sequences[:, input_ids.shape[1]:]  # Slice out the generated part
+        self.token_num = generated_tokens.shape[1]  # Store number of generated tokens
 
-        self.token_num = outputs.sequences.shape[1] - input_ids.shape[1]
-
-        return {"role": "assistant", "content": self.tokenizer.decode(answer_tokens).strip()}
+        return {"role": "assistant",
+                "content": self.tokenizer.decode(generated_tokens[0], skip_special_tokens=True).strip()}
 
     def query_API_to_get_message(self, messages):
         while True:
@@ -140,6 +144,7 @@ class ChatGPT:
                 return res
             except Exception as e:
                 print(f"An error occurred: {e}")
+                logging.exception(e)
                 time.sleep(20)
 
     def reset_history(self):
@@ -399,7 +404,7 @@ def parse_args():
     parser.add_argument("--candidate_num", default=50, type=int)
     parser.add_argument("--output_path", default="./outputs/wn18rr/output_score.txt")
     parser.add_argument("--chat_log_path", default="./outputs/wn18rr/chat_score.txt")
-    parser.add_argument("--query", default="tail", required=True)
+    parser.add_argument("--query", default="tail", required=False)
     parser.add_argument("--model_path", default=None)
 
     parser.add_argument("--debug", action="store_true")

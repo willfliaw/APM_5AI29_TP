@@ -5,10 +5,12 @@ Prompt Engineering: 1. Add comparable  2. Add confidence scoreto better and conf
 
 import heapq
 import json
+import os
+import pickle
 from collections import defaultdict
 
 from gensim import corpora
-from gensim.summarization.bm25 import BM25
+from bm25 import BM25
 
 
 class Demon_sampler:
@@ -27,6 +29,26 @@ class Demon_sampler:
         self.demo_list_execution = []
 
     def load_demonstration(self):
+        # Create a unique cache identifier based on dataset + query
+        cache_key = f"{self.dataset}_{self.args.query}"
+        cache_dir = "/Data/KICGPT/cache/"  # Store cache separately from dataset
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_file = os.path.join(cache_dir, f"{cache_key}.pkl")
+
+        # Check if cache exists and load if available
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, "rb") as cf:
+                    cache_data = pickle.load(cf)
+                # Restore cached data
+                self.entity_supplement = cache_data["entity_supplement"]
+                self.relation_analogy = cache_data["relation_analogy"]
+                self.link_base_txt = cache_data["link_base_txt"]
+                return  # Cached data is loaded; no need to recalculated
+            except Exception as e:
+                print("Cache loading failed, recalculating:", e)
+
+        # --- If we reach here, we need to compute the data ---
         with open(
             "/Data/KICGPT/dataset/" + self.dataset + "/demonstration/" + self.args.query + "_supplement.txt",
             "r",
@@ -67,6 +89,18 @@ class Demon_sampler:
                     tmp_list.append([value[0], value[1], value[2]])
 
             self.link_base_txt[key] = tmp_list
+
+        # Save computed data in cache
+        cache_data = {
+            "entity_supplement": self.entity_supplement,
+            "relation_analogy": self.relation_analogy,
+            "link_base_txt": self.link_base_txt,
+        }
+        try:
+            with open(cache_file, "wb") as cf:
+                pickle.dump(cache_data, cf)
+        except Exception as e:
+            print("Failed to write cache:", e)
 
     def true_candidates(self, h, r):
         return self.T_link_base["\t".join([h, r])][2]
@@ -136,8 +170,8 @@ class Demon_sampler:
 
     def shrink_link_base(self):
         with open(
-            "/Data/KICGPT/dataset/" + self.dataset + "/demonstration/" + "T_link_base_" + self.args.query + ".txt",
-            "r",
+                "/Data/KICGPT/dataset/" + self.dataset + "/demonstration/" + "T_link_base_" + self.args.query + ".txt",
+                "r",
         ) as f:
             self.link_base = json.load(f)
 
@@ -164,7 +198,6 @@ class Demon_sampler:
     def true_candidate_v2(self, h, r, num):
         true_set = self.link_base_txt["\t".join([h, r])][:num]
         return true_set
-
 
 # if __name__ == '__main__':
 #     parser = argparse.ArgumentParser()
