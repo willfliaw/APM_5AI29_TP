@@ -151,6 +151,8 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 \todo{Define precisely what we are doing (predicting head/tail or just the relation?). Maybe Include a small example to illustrate the problem? Should not be necessary}
 \todo{Be mathematically rigierous}
 
+% Knowledge Graph Completion (KGC) is a fundamental task in artificial intelligence aimed at addressing the inherent incompleteness of knowledge graphs (KGs). KGs represent real-world facts as structured triples of the form $(h, r, t)$, where $h$ (head entity) and $t$ (tail entity) are connected by a relation $r$. Despite their widespread use in search engines, recommendation systems, and question-answering applications, KGs suffer from missing information, necessitating the development of KGC techniques to predict missing elements and improve KG utility.
+
 % ---------------------------------------------------------
 %
 % BACKGROUND
@@ -160,9 +162,23 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 
 \section{Background}\label{sec:background}
 \todo{Disguise for related work, however it should not look like related work. What has to be done here is to QUICKLY introduce classical models, then go over to the distingsion we are going to draw which is fine tuning vs. pure promt engineering. This clear distingsion does not exist, but we will pretend}
-\todo{Talk about Prompt engineering, speciaially KICGPT, throw in a couple of other papers for additional **BaCkGrOuND** and find a reason why we choose KICGPT}
+\todo{Talk about Prompt engineering, speciaially KICGPT, throw in a couple of other papers for additional BaCkGrOuND and find a reason why we choose KICGPT}
 \todo{Same for KoPA}
 \todo{VERY BRIEF general comparison of approaches}
+
+Early KGC research centered on triple-based models using embedding methods to represent entities and relations in a continuous vector space. TransE \cite{bordes2013translating} models relations as translation operations, while DistMult \cite{yang2014embedding} and ComplEx \cite{trouillon2016complex} apply tensor factorization, the latter extending to complex-valued embeddings.
+
+Advancements introduced Graph Neural Networks (GNNs) \cite{schlichtkrull2018modeling} to refine entity representations by aggregating structural information. However, these models struggle with long-tail entities due to sparse connectivity, limiting predictive performance.
+
+To overcome these limitations, text-based KGC leverages pre-trained language models (PLMs) to incorporate entity and relation descriptions. KG-BERT \cite{yao2019kgbert} reframes KGC as a classification problem, encoding triples as text for distinguishing valid from invalid ones. Despite effectiveness, these methods require extensive fine-tuning and high computational costs, restricting scalability.
+
+Large language models (LLMs) have revolutionized KGC via in-context learning (ICL) and instruction tuning, enabling link prediction without explicit retraining. Unlike fixed-structure KG models, LLMs leverage broad internal knowledge for zero-shot and few-shot predictions. However, they face challenges like hallucination (factually incorrect outputs) and structural misalignment with KG schemas.
+
+Two main strategies integrate LLMs into KGC: \textbf{Prompt Engineering}: Uses structured prompts to guide LLM reasoning without altering model weights. It is efficient and adaptable but relies on well-designed prompts \cite{liu2021pretrain}. \textbf{Fine-Tuning}: Embeds structured knowledge into model parameters by training on KG-specific tasks. While enhancing domain reasoning, it is resource-intensive and dataset-dependent \cite{raffel2020exploring}.
+
+Recent approaches refine LLM-based KGC by integrating structured knowledge retrieval and optimization techniques. \textbf{KICGPT} \cite{shi2023kicgpt} introduces a \textit{retriever-integrated prompting approach}, which first retrieves a ranked list of candidate entities using a traditional triple-based KGC model. This ranked list is then refined by the LLM through \textit{Knowledge Prompts}, an in-context learning strategy that encodes KG structure into the prompt. This approach significantly reduces the reliance on model fine-tuning while enhancing long-tail entity predictions by leveraging both structured KG knowledge and the vast semantic knowledge stored within the LLM.
+
+Alternatively, \textbf{KoPA} \cite{qin2023kopa} employs a \textit{Knowledge Prefix Adapter}, which bridges structural KG embeddings with textual LLM reasoning. Unlike KICGPT, which relies on prompting, KoPA introduces a fine-tuning strategy where pre-trained structural embeddings are mapped into the LLM's textual space using an adapter network. These embeddings are then injected as \textit{virtual tokens} at the beginning of the prompt, providing structure-aware guidance throughout inference. By explicitly integrating graph topology into LLM-based KGC, KoPA enhances reasoning over complex relational structures while improving generalization to unseen entities.
 
 % ---------------------------------------------------------
 %
