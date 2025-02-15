@@ -174,11 +174,13 @@ To overcome these limitations, text-based KGC leverages pre-trained language mod
 
 Large language models (LLMs) have revolutionized KGC via in-context learning (ICL) and instruction tuning, enabling link prediction without explicit retraining. Unlike fixed-structure KG models, LLMs leverage broad internal knowledge for zero-shot and few-shot predictions. However, they face challenges like hallucination (factually incorrect outputs) and structural misalignment with KG schemas.
 
-Two main strategies integrate LLMs into KGC: \textbf{Prompt Engineering}: Uses structured prompts to guide LLM reasoning without altering model weights. It is efficient and adaptable but relies on well-designed prompts \cite{liu2021pretrain}. \textbf{Fine-Tuning}: Embeds structured knowledge into model parameters by training on KG-specific tasks. While enhancing domain reasoning, it is resource-intensive and dataset-dependent \cite{raffel2020exploring}.
+Two main strategies integrate LLMs into KGC: \textbf{Purely Prompt-Based Methods}, which leverage structured retrieval and in-context learning without modifying model parameters, and \textbf{Fine-Tuning-Based Methods}, which embed structured knowledge into the model through additional training. The former is efficient and adaptable but depends on well-designed retrieval mechanisms, while the latter enhances domain-specific reasoning at the cost of increased computational demands and dataset dependency.
 
-Recent approaches refine LLM-based KGC by integrating structured knowledge retrieval and optimization techniques. \textbf{KICGPT} \cite{shi2023kicgpt} introduces a \textit{retriever-integrated prompting approach}, which first retrieves a ranked list of candidate entities using a traditional triple-based KGC model. This ranked list is then refined by the LLM through \textit{Knowledge Prompts}, an in-context learning strategy that encodes KG structure into the prompt. This approach significantly reduces the reliance on model fine-tuning while enhancing long-tail entity predictions by leveraging both structured KG knowledge and the vast semantic knowledge stored within the LLM.
+Among purely prompt-based approaches, KICGPT \cite{wei2023kicgpt} exemplifies a retriever-integrated prompting strategy, where a traditional triple-based KGC model retrieves a ranked list of candidate entities, which is then refined by an LLM through Knowledge Prompts—an in-context learning technique encoding KG structure into prompts. Similarly, MPIKGC \cite{xu2024mpikgc} enhances description-based KGC models by querying LLMs to expand entity descriptions, improve relation understanding, and extract structural information, without modifying the LLM's parameters. These methods demonstrate that effective KGC can be achieved without fine-tuning, reducing computational costs while leveraging structured retrieval mechanisms.
 
-Alternatively, \textbf{KoPA} \cite{qin2023kopa} employs a \textit{Knowledge Prefix Adapter}, which bridges structural KG embeddings with textual LLM reasoning. Unlike KICGPT, which relies on prompting, KoPA introduces a fine-tuning strategy where pre-trained structural embeddings are mapped into the LLM's textual space using an adapter network. These embeddings are then injected as \textit{virtual tokens} at the beginning of the prompt, providing structure-aware guidance throughout inference. By explicitly integrating graph topology into LLM-based KGC, KoPA enhances reasoning over complex relational structures while improving generalization to unseen entities.
+Conversely, fine-tuning-based approaches modify LLM parameters to embed structured KG knowledge directly. KoPA \cite{qin2023kopa} introduces a Knowledge Prefix Adapter, mapping KG structural embeddings into the LLM's textual space via an adapter network, allowing structure-aware guidance during inference. DIFT \cite{liu2024dift} fine-tunes LLMs with discrimination instructions, refining the model's ability to select correct KG entities while mitigating grounding errors. KC-GenRe \cite{wang2024kcgenre} proposes a knowledge-constrained generative re-ranking method, leveraging LLM fine-tuning to improve entity ranking through structured guidance. Additionally, RPKGC \cite{khalil2024rpkgc} fine-tunes an LLM for relation prediction, training the model to infer plausible relations between entity pairs. These methods enhance reasoning capabilities at the expense of increased training complexity and resource requirements.
+
+Given their distinct yet complementary methodologies, the remaining sections of this report will focus on KICGPT and KoPA, providing a detailed examination of their underlying principles, implementation details, and comparative advantages in leveraging LLMs for KGC.
 
 % ---------------------------------------------------------
 %
@@ -193,35 +195,35 @@ Alternatively, \textbf{KoPA} \cite{qin2023kopa} employs a \textit{Knowledge Pref
 \todo{Another ultra fancy picture}
 \todo{it might be hard to seperate this from the previous section, however it should be possible, if not we can also fuse them, but it might hinder readability since we keep jumping all over the place (cause other papers are required for background)}
 
-In this project, we  focus on LLM-based KGC and explore two different 
+In this project, we  focus on LLM-based KGC and explore two different
 state-of-the-art approaches: link prediction with KICGPT
-and triple classification with KoPA. 
+and triple classification with KoPA.
 While these tasks differ, they share a fundamental idea where both
-methods use LLMs to assess and predict entity relationships 
-in a KG. KICGPT tackles link prediction using prompt engineering, 
-where demonstrations help guide the LLM in predicting missing entities. 
-Meanwhile, KoPA employs fine-tuning and embed structural information 
-as a prefix of LLM input performs triple classification to determine the 
-correctness of a given triple. However, at its core, KoPA also relies 
-on link prediction, as the LLM implicitly evaluates whether the 
-connection in the triple is plausible or not. The key difference 
-lies in execution: KICGPT predicts missing entities, while KoPA 
-predicts the validity of an existing triple by assessing whether 
+methods use LLMs to assess and predict entity relationships
+in a KG. KICGPT tackles link prediction using prompt engineering,
+where demonstrations help guide the LLM in predicting missing entities.
+Meanwhile, KoPA employs fine-tuning and embed structural information
+as a prefix of LLM input performs triple classification to determine the
+correctness of a given triple. However, at its core, KoPA also relies
+on link prediction, as the LLM implicitly evaluates whether the
+connection in the triple is plausible or not. The key difference
+lies in execution: KICGPT predicts missing entities, while KoPA
+predicts the validity of an existing triple by assessing whether
 the inferred link is correct.
 
-% Both approaches leverage LLMs to enhance KGC performance, 
-% but differ in their integration strategies. KICGPT adopts a prompt 
-% engineering approach, using demonstrations to guide LLM reasoning, 
+% Both approaches leverage LLMs to enhance KGC performance,
+% but differ in their integration strategies. KICGPT adopts a prompt
+% engineering approach, using demonstrations to guide LLM reasoning,
 % while KoPA employs fine-tuning and embed structural information as a prefix of LLM input.
 
-For link prediction task, given an incomplete triple in a KG \((h, r, ?)\) or \((?, r, t)\), 
-the goal is to predict the missing entity, either it is head \(h\) 
-or tail \(t\), where \(h, t \in E\) and \(r \in R\), E denotes set of 
-entities, R denotes set of relations. For the triple classification task, 
-the objective is to determine the correctness of the triple given an input 
+For link prediction task, given an incomplete triple in a KG \((h, r, ?)\) or \((?, r, t)\),
+the goal is to predict the missing entity, either it is head \(h\)
+or tail \(t\), where \(h, t \in E\) and \(r \in R\), E denotes set of
+entities, R denotes set of relations. For the triple classification task,
+the objective is to determine the correctness of the triple given an input
 triple from a KG by comparing it with the ground truth.
-The model that we used follows 
-KICGPT \cite{wei2023kicgpt} and KoPA \cite{qin2023kopa} with modification on the LLM backbone. 
+The model that we used follows
+KICGPT \cite{wei2023kicgpt} and KoPA \cite{qin2023kopa} with modification on the LLM backbone.
 
 \subsection{KICGPT}
 \label{sec:method:kicgpt}
@@ -236,60 +238,60 @@ KICGPT \cite{wei2023kicgpt} and KoPA \cite{qin2023kopa} with modification on the
     \label{fig:KICGPTarchitecture}
 \end{figure}
 
-KICGPT primarily covers three main components as can be seen in Figure 
-\ref{fig:KICGPTarchitecture}, which are a triple-based KGC retriever, 
-the Knowledge Prompt, and a LLM. For each query triple \((h, r, ?)\), 
-the KGC retriever retrieves the score of \((h, r, e)\) for each entity 
-\(e \in E\) in descending order 
-\(R_{retriever} = [e_1, e_2, ..., e_{|E|}]\). 
-Using prompt engineering in the Knowledge Prompt, LLM performs reranking 
-of the top \(m\) entities 
-\(R_{LLM} = [e^{'}_1, e^{'}_2, ..., e^{'}_m]\). Finally, KICGPT will 
+KICGPT primarily covers three main components as can be seen in Figure
+\ref{fig:KICGPTarchitecture}, which are a triple-based KGC retriever,
+the Knowledge Prompt, and a LLM. For each query triple \((h, r, ?)\),
+the KGC retriever retrieves the score of \((h, r, e)\) for each entity
+\(e \in E\) in descending order
+\(R_{retriever} = [e_1, e_2, ..., e_{|E|}]\).
+Using prompt engineering in the Knowledge Prompt, LLM performs reranking
+of the top \(m\) entities
+\(R_{LLM} = [e^{'}_1, e^{'}_2, ..., e^{'}_m]\). Finally, KICGPT will
 output final ranking of top m entities from the LLM and the rest of
-the entities from the KGC retriever 
+the entities from the KGC retriever
 \(R_{KICGPT} = [e^{'}_1, e^{'}_2, ..., e^{'}_m, e_{m+1}, ..., e_{|E|}]\)
 
 \subsubsection{Knowledge Prompt}
 Knowledge Prompt is introduced in KICGPT as in-context learning
 strategy to provide context to the LLM by integrating part of the KG
-into the demonstration. There are two pools of triples in the 
-demonstration, analogy pool \(D_a\) and supplement pool \(D_s\). 
-To help the LLM understand the query triple, the analogy pool contains 
-triples with the same relation \(r\) as the query \((h, r, ?)\), 
+into the demonstration. There are two pools of triples in the
+demonstration, analogy pool \(D_a\) and supplement pool \(D_s\).
+To help the LLM understand the query triple, the analogy pool contains
+triples with the same relation \(r\) as the query \((h, r, ?)\),
 \(D_a = \{(e^{'}, r, e^{"}) \in G_{train} \cup G_{valid} \mid e, e^{"} \in E\}\).
-In addition, the supplement pool contains triples with one of its entity 
+In addition, the supplement pool contains triples with one of its entity
 (tail or head) is the same as the query's head \((h, r, ?)\),
 \(D_s = \{(h, r, e^{'}) \in G_{train} \cup G_{valid} \mid r^{'} \in R, e^{'} \in E\} \cup
 \{(e^{'}, r, h) \in G_{train} \cup G_{valid} \mid r^{'} \in R, e^{'} \in E\}\).
 This is to provide additional information of the query's head to the LLM.
 
 The ordering of the demonstration is important as it affects the LLM performance.
-For the analogy pool, each entity starts with a zero counter. 
+For the analogy pool, each entity starts with a zero counter.
 A random triple from \(D_a\) is chosen first, increasing its entities'
-counters by 1. Next, the triple with the lowest summed counter values 
-is selected, repeating until all triples are used. The final ordered 
-list is denoted \(L_a\). The supplement pool \(D_s\) provides additional context 
-for the query's head entity \(h\), prioritizing relevant demonstrations. 
-To achieve this, triples in \(D_s\) are ranked based on their BM25 scores, 
-which measure their textual similarity to the query. The final ordered list, 
+counters by 1. Next, the triple with the lowest summed counter values
+is selected, repeating until all triples are used. The final ordered
+list is denoted \(L_a\). The supplement pool \(D_s\) provides additional context
+for the query's head entity \(h\), prioritizing relevant demonstrations.
+To achieve this, triples in \(D_s\) are ranked based on their BM25 scores,
+which measure their textual similarity to the query. The final ordered list,
 denoted \(L_s\), includes all triples from \(D_s\).
 
 \subsubsection{Prompt Engineering}
 
-To adapt structured triples into natural language input, KICGPT uses 
-a unified prompt template, ensuring consistent formatting for queries 
-and demonstrations. The interaction with the LLM follows a multi-round 
-process. First, the responsibility description stage clarifies the LLM's 
-role in ranking candidate answers. Next, in the question and demonstration 
-description stage, the query is presented along with an explanation of 
+To adapt structured triples into natural language input, KICGPT uses
+a unified prompt template, ensuring consistent formatting for queries
+and demonstrations. The interaction with the LLM follows a multi-round
+process. First, the responsibility description stage clarifies the LLM's
+role in ranking candidate answers. Next, in the question and demonstration
+description stage, the query is presented along with an explanation of
 two demonstration types: analogy-based and supplementary examples.
 
-In the demonstration input stage, batches of demonstrations from the 
-analogy \(L_a\) and supplement \(L_s\) pools are provided, repeated 
-as much as the token limit allows to maximize knowledge inclusion. 
-Finally, during the final query and re-ranking stage, the LLM ranks 
-the top-m candidate entities, producing an ordered list \(R_{LLM}\), 
-which replaces the top-m results from the retriever to generate the 
+In the demonstration input stage, batches of demonstrations from the
+analogy \(L_a\) and supplement \(L_s\) pools are provided, repeated
+as much as the token limit allows to maximize knowledge inclusion.
+Finally, during the final query and re-ranking stage, the LLM ranks
+the top-m candidate entities, producing an ordered list \(R_{LLM}\),
+which replaces the top-m results from the retriever to generate the
 final answer.
 
 \begin{figure}
@@ -302,31 +304,31 @@ final answer.
 \subsection{KoPA}
 \label{sec:method:kopa}
 Unlike KICGPT, KoPA integrates the structural information of
-the KG into the LLM as an input. As can be seen in Figure \ref{fig:KoPAarchitecture}, 
+the KG into the LLM as an input. As can be seen in Figure \ref{fig:KoPAarchitecture},
 KoPA comprises two main components: structural
 embedding and knowledge prefix adapter.
 
 \subsubsection{Structural Embedding}
-KoPA captures structural information through self-supervised 
-structural embedding pre-training rather than adding neighborhood 
-text to the input. Each entity \(e \in E\)  and relation \(r \in R\)  
-is assigned a structural embedding, \(\mathbf{e} \in {R}^{d_e}\)  
-and \(\mathbf{r} \in {R}^{d_r}\), mapped into the 
+KoPA captures structural information through self-supervised
+structural embedding pre-training rather than adding neighborhood
+text to the input. Each entity \(e \in E\)  and relation \(r \in R\)
+is assigned a structural embedding, \(\mathbf{e} \in {R}^{d_e}\)
+and \(\mathbf{r} \in {R}^{d_r}\), mapped into the
 LLM's textual space.
 
-To measure triple plausibility, KoPA follows the embedding-based 
-KGC paradigm by defining a score function \(F(h, r, t)\). 
-It optimizes structural embeddings using negative sampling 
-in a self-supervised pre-training process. By minimizing the 
-pre-training loss, the model captures subgraph structures and 
-relational patterns, aligning entity and relation representations 
+To measure triple plausibility, KoPA follows the embedding-based
+KGC paradigm by defining a score function \(F(h, r, t)\).
+It optimizes structural embeddings using negative sampling
+in a self-supervised pre-training process. By minimizing the
+pre-training loss, the model captures subgraph structures and
+relational patterns, aligning entity and relation representations
 with KG structures.
 
 \subsubsection{Knowledge Prefix Adapter}
-After pre-training, the structural embeddings \((h, r, t)\) encode 
-KG information but exist in a different space from the LLM's textual 
-representations. To bridge this gap, a knowledge prefix adapter \(P\) 
-projects these embeddings into the LLM's token space by converting 
+After pre-training, the structural embeddings \((h, r, t)\) encode
+KG information but exist in a different space from the LLM's textual
+representations. To bridge this gap, a knowledge prefix adapter \(P\)
+projects these embeddings into the LLM's token space by converting
 them into virtual knowledge tokens (K):
 
 \begin{equation}
@@ -334,9 +336,9 @@ them into virtual knowledge tokens (K):
 \end{equation}
 
 These tokens are added as prefix of the input sequence. It allows
-the LLM to pay attention to structural information during fine-tuning 
-and inference. The adapter is trained while keeping embeddings 
-fixed to enable generalization to new triples, enrich textual 
+the LLM to pay attention to structural information during fine-tuning
+and inference. The adapter is trained while keeping embeddings
+fixed to enable generalization to new triples, enrich textual
 descriptions, and improve predictions.
 % ---------------------------------------------------------
 %
@@ -435,6 +437,48 @@ descriptions, and improve predictions.
     \label{fig:training_comparison}
 \end{figure}
 
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            bar width=8pt,
+            enlarge x limits=0.25,
+            ylabel={Score},
+            ymin=0,
+            ymax=1,
+            symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+            xtick=data,
+            legend pos=north west,
+            nodes near coords,
+            width=10cm,
+            height=6cm
+        ]
+
+        % Model A
+        \addplot[fill=gray] coordinates {
+            (MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)
+        };
+        \addlegendentry{Paper}
+
+        % Model B
+        \addplot[fill=blue] coordinates {
+            (MRR,0.3212) (Hits@1,0.1807) (Hits@3,0.3811) (Hits@10,0.5962)
+        };
+        \addlegendentry{\modelalpaca}
+
+        % Model C
+        \addplot[fill=purple] coordinates {
+            (MRR,0.2950) (Hits@1,0.1500) (Hits@3,0.3600) (Hits@10,0.5800)
+        };
+        \addlegendentry{\modeldeepseek}
+
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Comparison of Link Prediction Metrics Across Models}
+    \label{fig:link_prediction}
+\end{figure}
+
 
 \todo{Maybe shortly explain dataset?}
 \todo{maybe QUICKLY intro metrics, however should be known already}
@@ -452,8 +496,6 @@ All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU
 
 
 \todo{Performance of KICGPT}
-
-
 
 \todo{very unhappy with this, need to write somethign like this}
 Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \modelalpaca on the CoDeX~\cite{safavi2020codex} dataset.
