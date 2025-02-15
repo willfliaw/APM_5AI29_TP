@@ -365,6 +365,48 @@ final answer.
     \label{fig:training_comparison}
 \end{figure}
 
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            bar width=8pt,
+            enlarge x limits=0.25,
+            ylabel={Score},
+            ymin=0,
+            ymax=1,
+            symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+            xtick=data,
+            legend pos=north west,
+            nodes near coords,
+            width=10cm,
+            height=6cm
+        ]
+
+        % Model A
+        \addplot[fill=gray] coordinates {
+            (MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)
+        };
+        \addlegendentry{Paper}
+
+        % Model B
+        \addplot[fill=blue] coordinates {
+            (MRR,0.3212) (Hits@1,0.1807) (Hits@3,0.3811) (Hits@10,0.5962)
+        };
+        \addlegendentry{\modelalpaca}
+
+        % Model C
+        \addplot[fill=purple] coordinates {
+            (MRR,0.2950) (Hits@1,0.1500) (Hits@3,0.3600) (Hits@10,0.5800)
+        };
+        \addlegendentry{\modeldeepseek}
+
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Comparison of Link Prediction Metrics Across Models}
+    \label{fig:link_prediction}
+\end{figure}
+
 
 \todo{Maybe shortly explain dataset?}
 \todo{maybe QUICKLY intro metrics, however should be known already}
@@ -382,8 +424,6 @@ All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU
 
 
 \todo{Performance of KICGPT}
-
-
 
 \todo{very unhappy with this, need to write somethign like this}
 Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \modelalpaca on the CoDeX~\cite{safavi2020codex} dataset.
