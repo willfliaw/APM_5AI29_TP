@@ -174,11 +174,13 @@ To overcome these limitations, text-based KGC leverages pre-trained language mod
 
 Large language models (LLMs) have revolutionized KGC via in-context learning (ICL) and instruction tuning, enabling link prediction without explicit retraining. Unlike fixed-structure KG models, LLMs leverage broad internal knowledge for zero-shot and few-shot predictions. However, they face challenges like hallucination (factually incorrect outputs) and structural misalignment with KG schemas.
 
-Two main strategies integrate LLMs into KGC: \textbf{Prompt Engineering}: Uses structured prompts to guide LLM reasoning without altering model weights. It is efficient and adaptable but relies on well-designed prompts \cite{liu2021pretrain}. \textbf{Fine-Tuning}: Embeds structured knowledge into model parameters by training on KG-specific tasks. While enhancing domain reasoning, it is resource-intensive and dataset-dependent \cite{raffel2020exploring}.
+Two main strategies integrate LLMs into KGC: \textbf{Purely Prompt-Based Methods}, which leverage structured retrieval and in-context learning without modifying model parameters, and \textbf{Fine-Tuning-Based Methods}, which embed structured knowledge into the model through additional training. The former is efficient and adaptable but depends on well-designed retrieval mechanisms, while the latter enhances domain-specific reasoning at the cost of increased computational demands and dataset dependency.
 
-Recent approaches refine LLM-based KGC by integrating structured knowledge retrieval and optimization techniques. \textbf{KICGPT} \cite{shi2023kicgpt} introduces a \textit{retriever-integrated prompting approach}, which first retrieves a ranked list of candidate entities using a traditional triple-based KGC model. This ranked list is then refined by the LLM through \textit{Knowledge Prompts}, an in-context learning strategy that encodes KG structure into the prompt. This approach significantly reduces the reliance on model fine-tuning while enhancing long-tail entity predictions by leveraging both structured KG knowledge and the vast semantic knowledge stored within the LLM.
+Among purely prompt-based approaches, KICGPT \cite{wei2023kicgpt} exemplifies a retriever-integrated prompting strategy, where a traditional triple-based KGC model retrieves a ranked list of candidate entities, which is then refined by an LLM through Knowledge Prompts—an in-context learning technique encoding KG structure into prompts. Similarly, MPIKGC \cite{xu2024mpikgc} enhances description-based KGC models by querying LLMs to expand entity descriptions, improve relation understanding, and extract structural information, without modifying the LLM's parameters. These methods demonstrate that effective KGC can be achieved without fine-tuning, reducing computational costs while leveraging structured retrieval mechanisms.
 
-Alternatively, \textbf{KoPA} \cite{qin2023kopa} employs a \textit{Knowledge Prefix Adapter}, which bridges structural KG embeddings with textual LLM reasoning. Unlike KICGPT, which relies on prompting, KoPA introduces a fine-tuning strategy where pre-trained structural embeddings are mapped into the LLM's textual space using an adapter network. These embeddings are then injected as \textit{virtual tokens} at the beginning of the prompt, providing structure-aware guidance throughout inference. By explicitly integrating graph topology into LLM-based KGC, KoPA enhances reasoning over complex relational structures while improving generalization to unseen entities.
+Conversely, fine-tuning-based approaches modify LLM parameters to embed structured KG knowledge directly. KoPA \cite{qin2023kopa} introduces a Knowledge Prefix Adapter, mapping KG structural embeddings into the LLM's textual space via an adapter network, allowing structure-aware guidance during inference. DIFT \cite{liu2024dift} fine-tunes LLMs with discrimination instructions, refining the model's ability to select correct KG entities while mitigating grounding errors. KC-GenRe \cite{wang2024kcgenre} proposes a knowledge-constrained generative re-ranking method, leveraging LLM fine-tuning to improve entity ranking through structured guidance. Additionally, RPKGC \cite{khalil2024rpkgc} fine-tunes an LLM for relation prediction, training the model to infer plausible relations between entity pairs. These methods enhance reasoning capabilities at the expense of increased training complexity and resource requirements.
+
+Given their distinct yet complementary methodologies, the remaining sections of this report will focus on KICGPT and KoPA, providing a detailed examination of their underlying principles, implementation details, and comparative advantages in leveraging LLMs for KGC.
 
 % ---------------------------------------------------------
 %
@@ -193,12 +195,12 @@ Alternatively, \textbf{KoPA} \cite{qin2023kopa} employs a \textit{Knowledge Pref
 \todo{Another ultra fancy picture}
 \todo{it might be hard to seperate this from the previous section, however it should be possible, if not we can also fuse them, but it might hinder readability since we keep jumping all over the place (cause other papers are required for background)}
 
-In this project, we focus on link prediction task for knowledge graphs 
-(KGs). Given incomplete triple in a KG \((h, r, ?)\) or \((?, r, t)\), 
-the goal is to predict the missing entity, either it is head \(h\) 
-or tail \(t\), where \(h, t \in E\) and \(r \in R\), E denotes set of 
-entities, R denotes set of relations. The model that we used follows 
-KICGPT \cite{wei2023kicgpt} with modification on the LLM used. 
+In this project, we focus on link prediction task for knowledge graphs
+(KGs). Given incomplete triple in a KG \((h, r, ?)\) or \((?, r, t)\),
+the goal is to predict the missing entity, either it is head \(h\)
+or tail \(t\), where \(h, t \in E\) and \(r \in R\), E denotes set of
+entities, R denotes set of relations. The model that we used follows
+KICGPT \cite{wei2023kicgpt} with modification on the LLM used.
 
 \subsection{Architecture}
 \label{sec:method:architecture}
@@ -210,60 +212,60 @@ KICGPT \cite{wei2023kicgpt} with modification on the LLM used.
     \label{fig:KICGPTarchitecture}
 \end{figure}
 
-KICGPT primarily covers three main components as can be seen in Figure 
-\ref{fig:KICGPTarchitecture}, which are a triple-based KGC retriever, 
-the Knowledge Prompt, and a LLM. For each query triple \((h, r, ?)\), 
-the KGC retriever retrieves the score of \((h, r, e)\) for each entity 
-\(e \in E\) in descending order 
-\(R_{retriever} = [e_1, e_2, ..., e_{|E|}]\). 
-Using prompt engineering in the Knowledge Prompt, LLM performs reranking 
-of the top \(m\) entities 
-\(R_{LLM} = [e^{'}_1, e^{'}_2, ..., e^{'}_m]\). Finally, KICGPT will 
+KICGPT primarily covers three main components as can be seen in Figure
+\ref{fig:KICGPTarchitecture}, which are a triple-based KGC retriever,
+the Knowledge Prompt, and a LLM. For each query triple \((h, r, ?)\),
+the KGC retriever retrieves the score of \((h, r, e)\) for each entity
+\(e \in E\) in descending order
+\(R_{retriever} = [e_1, e_2, ..., e_{|E|}]\).
+Using prompt engineering in the Knowledge Prompt, LLM performs reranking
+of the top \(m\) entities
+\(R_{LLM} = [e^{'}_1, e^{'}_2, ..., e^{'}_m]\). Finally, KICGPT will
 output final ranking of top m entities from the LLM and the rest of
-the entities from the KGC retriever 
+the entities from the KGC retriever
 \(R_{KICGPT} = [e^{'}_1, e^{'}_2, ..., e^{'}_m, e_{m+1}, ..., e_{|E|}]\)
 
 \subsubsection{Knowledge Prompt}
 Knowledge Prompt is introduced in KICGPT as in-context learning
 strategy to provide context to the LLM by integrating part of the KG
-into the demonstration. There are two pools of triples in the 
-demonstration, analogy pool \(D_a\) and supplement pool \(D_s\). 
-To help the LLM understand the query triple, the analogy pool contains 
-triples with the same relation \(r\) as the query \((h, r, ?)\), 
+into the demonstration. There are two pools of triples in the
+demonstration, analogy pool \(D_a\) and supplement pool \(D_s\).
+To help the LLM understand the query triple, the analogy pool contains
+triples with the same relation \(r\) as the query \((h, r, ?)\),
 \(D_a = \{(e^{'}, r, e^{"}) \in G_{train} \cup G_{valid} \mid e, e^{"} \in E\}\).
-In addition, the supplement pool contains triples with one of its entity 
+In addition, the supplement pool contains triples with one of its entity
 (tail or head) is the same as the query's head \((h, r, ?)\),
 \(D_s = \{(h, r, e^{'}) \in G_{train} \cup G_{valid} \mid r^{'} \in R, e^{'} \in E\} \cup
 \{(e^{'}, r, h) \in G_{train} \cup G_{valid} \mid r^{'} \in R, e^{'} \in E\}\).
 This is to provide additional information of the query's head to the LLM.
 
 The ordering of the demonstration is important as it affects the LLM performance.
-For the analogy pool, each entity starts with a zero counter. 
+For the analogy pool, each entity starts with a zero counter.
 A random triple from \(D_a\) is chosen first, increasing its entities'
-counters by 1. Next, the triple with the lowest summed counter values 
-is selected, repeating until all triples are used. The final ordered 
-list is denoted \(L_a\). The supplement pool \(D_s\) provides additional context 
-for the query's head entity \(h\), prioritizing relevant demonstrations. 
-To achieve this, triples in \(D_s\) are ranked based on their BM25 scores, 
-which measure their textual similarity to the query. The final ordered list, 
+counters by 1. Next, the triple with the lowest summed counter values
+is selected, repeating until all triples are used. The final ordered
+list is denoted \(L_a\). The supplement pool \(D_s\) provides additional context
+for the query's head entity \(h\), prioritizing relevant demonstrations.
+To achieve this, triples in \(D_s\) are ranked based on their BM25 scores,
+which measure their textual similarity to the query. The final ordered list,
 denoted \(L_s\), includes all triples from \(D_s\).
 
 \subsubsection{Prompt Engineering}
 
-To adapt structured triples into natural language input, KICGPT uses 
-a unified prompt template, ensuring consistent formatting for queries 
-and demonstrations. The interaction with the LLM follows a multi-round 
-process. First, the responsibility description stage clarifies the LLM's 
-role in ranking candidate answers. Next, in the question and demonstration 
-description stage, the query is presented along with an explanation of 
+To adapt structured triples into natural language input, KICGPT uses
+a unified prompt template, ensuring consistent formatting for queries
+and demonstrations. The interaction with the LLM follows a multi-round
+process. First, the responsibility description stage clarifies the LLM's
+role in ranking candidate answers. Next, in the question and demonstration
+description stage, the query is presented along with an explanation of
 two demonstration types: analogy-based and supplementary examples.
 
-In the demonstration input stage, batches of demonstrations from the 
-analogy \(L_a\) and supplement \(L_s\) pools are provided, repeated 
-as much as the token limit allows to maximize knowledge inclusion. 
-Finally, during the final query and re-ranking stage, the LLM ranks 
-the top-m candidate entities, producing an ordered list \(R_{LLM}\), 
-which replaces the top-m results from the retriever to generate the 
+In the demonstration input stage, batches of demonstrations from the
+analogy \(L_a\) and supplement \(L_s\) pools are provided, repeated
+as much as the token limit allows to maximize knowledge inclusion.
+Finally, during the final query and re-ranking stage, the LLM ranks
+the top-m candidate entities, producing an ordered list \(R_{LLM}\),
+which replaces the top-m results from the retriever to generate the
 final answer.
 
 % ---------------------------------------------------------
