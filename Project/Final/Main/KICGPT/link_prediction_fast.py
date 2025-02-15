@@ -38,7 +38,9 @@ class ChatGPT:
 
         hf_token_file = "token.txt"
         hf_token = read_hf_token(hf_token_file)
-        llm_name = "mistralai/Ministral-8B-Instruct-2410"
+        # llm_name = "mistralai/Ministral-8B-Instruct-2410"
+        llm_name = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+        args.reasoning = True
 
         # Use 4-bit quantization and enable cuDNN benchmark for performance
         quantization_config = BitsAndBytesConfig(load_in_8bit=False, load_in_4bit=True)
@@ -63,16 +65,28 @@ class ChatGPT:
         )
         self.llm.eval()
 
-        self.generation_config = GenerationConfig(
-            max_new_tokens=self.max_tokens,
-            do_sample=False,  # Fully deterministic
-            # temperature=0.0,  # No randomness
-            top_p=1.0,  # No nucleus sampling
-            # top_k=1,  # Always pick the highest probability token
-            repetition_penalty=1.0,  # No extra penalties
-            eos_token_id=self.tokenizer.eos_token_id,
-            pad_token_id=self.tokenizer.pad_token_id,
-        )
+        # Modify generation settings based on reasoning argument
+        if self.args.reasoning:
+            self.generation_config = GenerationConfig(
+                max_new_tokens=self.max_tokens * 10, # double token limit
+                do_sample=True,  # Enable sampling
+                temperature=0.6,  # Allow some randomness (DeepSeek-R1: 0.5-0.7 recommended)
+                top_p=1.0,
+                top_k=50,  # Helps prevent extreme randomness
+                repetition_penalty=1.1,  # Discourage repetition
+                eos_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=self.tokenizer.pad_token_id,
+            )
+        else:
+            self.generation_config = GenerationConfig(
+                max_new_tokens=self.max_tokens,
+                do_sample=False,  # Fully deterministic
+                top_p=1.0,  # No nucleus sampling
+                repetition_penalty=1.0,  # No extra penalties
+                eos_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=self.tokenizer.pad_token_id,
+            )
+
 
     def create_message(self, input_text, turn_type):
         # Modify the prompt formatting if needed (e.g., remove "I will keep thinking" parts)
@@ -166,10 +180,6 @@ class Solver:
         self.LLM.reset_history()
         self.reset_history()
 
-        # System message
-        system_prompt = {"role": "system",
-                         "content": "You are an expert at ranking candidate answers based on examples."}
-
         # Prepare candidate answers context
         tpe_str = self.ent2text[tpe]
         candidate_key = "\t".join([str(self.ent2id[tpe]), str(self.rel2id[question])])
@@ -203,15 +213,26 @@ class Solver:
         # Build final query message
         final_query_message = self.LLM.create_message((origin_candidates_text, question_text), "final_query_template")
 
-        # Full conversation context
-        conversation = [system_prompt] + demonstration_examples + [final_query_message]
+        # Assemble full conversation context
+        conversation = demonstration_examples + [final_query_message]
+
+        # If reasoning is disabled, add a system prompt
+        if not self.args.reasoning:
+            system_prompt = {"role": "system",
+                             "content": "You are an expert at ranking candidate answers based on examples."}
+            conversation.insert(0, system_prompt)  # Ensure system prompt is first
+
+        # If reasoning is enabled, enforce <think> at the start of the response
+        if self.args.reasoning:
+            conversation[-1]["content"] = conversation[-1]["content"] + " Also please do NOT output lists which do not contain all words from the input even if you think its unnecessary, but output the list containing ALL words WITHOUT quotes seperated by |. Please please, inside of your <think> reasoning, please do NOT analyze each word individually, but try to think about them as groups, as i really want to have a quick answer and your thinking can take quite a while."
 
         final_response = self.LLM.generate_answer(conversation)
 
         # Parse and return final ranking
         self.log.append(final_response)
         final_order = self.parse_result(final_response["content"], "final_answer")
-        self.log.append(final_order)
+        final_order_string = " | ".join(final_order)
+        self.log.append(final_order_string)
 
         return final_order, self.LLM.history_contents, self.log
 
@@ -246,15 +267,46 @@ class Solver:
         return demonstration_text
 
     def parse_result(self, response, parse_type):
-        response = response.lower()
-        if parse_type == "final_answer" and "the final order:" in response:
-            final_order_raw = re.split("the final order:", response)[1].strip().strip(".").strip("[").strip("]")
+        """
+        Parses the response from the LLM, ensuring it always returns a list.
+        """
+        response = response.lower().strip()
+
+        if parse_type == "final_answer":
+            # Step 1: Remove everything before </think>
+            if "</think>" in response:
+                response = response.split("</think>", 1)[1].strip()
+
+            # Step 2: Identify "final answer" phrases and trim everything before the first one
+            final_answer_match = re.search(r"(the final answer is|the final order is|final answer:)", response,
+                                           re.IGNORECASE)
+            if final_answer_match:
+                response = response[final_answer_match.end():].strip()
+
+            # Step 3: Extract content inside the first set of square brackets
+            bracket_match = re.search(r"\[([^\]]+)\]", response)
+            if bracket_match:
+                final_order_raw = bracket_match.group(1).strip()
+            else:
+                final_order_raw = response  # If no brackets, take the whole response
+
+            # Step 4: Remove any leftover "final order" text before splitting
+            final_order_raw = re.sub(r"(the final order is|the final answer is|final order:)", "", final_order_raw,
+                                     flags=re.IGNORECASE).strip()
+
+            # Step 5: Split into a list using various reasonable separators
+            candidates = re.split(r"\s*\|\s*|\s*,\s*|\s*\n\s*|\s*\t\s*", final_order_raw)
+
+            # Remove duplicates while preserving order
             final_order_list = []
-            for candidate in final_order_raw.split(" | "):
-                if candidate not in final_order_list:
-                    final_order_list.append(candidate)
-            return " | ".join(final_order_list)
-        return response
+            for candidate in candidates:
+                clean_candidate = candidate.strip()
+                if clean_candidate and clean_candidate not in final_order_list:
+                    final_order_list.append(clean_candidate)
+
+            return final_order_list  # Always return a list
+
+        return []
 
     def reset_history(self):
         self.log = []
@@ -314,22 +366,26 @@ def main(args, all_data):
                 continue
             
 
-            sample["Prediction"] = prediction
+            sample["Prediction"] = " | ".join(prediction)
             fout.write(json.dumps(sample) + "\n")
 
-            # Ensure `prediction` is a properly formatted list of ranked candidates
-            if isinstance(prediction, list):
-                prediction_text = " | ".join(map(str, prediction))  # Ensure proper joining
-            else:
-                prediction_text = str(prediction)  # If it's somehow a single value, convert it safely
+            # Convert numeric ground-truth answer to text using ent2text
+            ground_truth_text = solver.ent2text.get(sample["Answer"], "UNKNOWN")
 
-            # Write to file
+            # Convert predictions to properly formatted text
+            if isinstance(prediction, list):
+                prediction_text = " | ".join(prediction)  # Ensure correct formatting
+            else:
+                prediction_text = str(prediction)
+
+            # Save correctly formatted predictions
             chat = (
-                    str(sample["ID"])
-                    + "\n"
-                    + "\n******\n".join(chat_history)
-                    + "\nAnswers: " + prediction_text  # Fix: Ensure correct formatting
-                    + "\n------------------------------------------\n"
+                    str(sample["ID"]) +
+                    "\n" +
+                    "\n******\n".join(chat_history) +
+                    "\nAnswers: " + prediction_text +  # Save ranked predictions as text
+                    "\nGround Truth: " + ground_truth_text +  # Save actual ground-truth text
+                    "\n------------------------------------------\n"
             )
             flog.write(chat)
 
@@ -369,12 +425,14 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
-    args.debug_online = True
+    args.debug_online = False
 
     with open(f"/Data/KICGPT/dataset/{args.dataset}/test_answer.txt", "r") as load_f:
         test_triplet = json.load(load_f)
     print(f"Totally {len(test_triplet)} test examples.")
     # If debugging online, limit the number of samples
     if args.debug_online:
-        test_triplet = test_triplet[: 2]
+        test_triplet = test_triplet[: 5]
+
+    test_triplet = test_triplet[:1000]
     main(args, test_triplet)
