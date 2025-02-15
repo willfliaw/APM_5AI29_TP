@@ -314,7 +314,7 @@ Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \model
 This process took 10 hours and 12 minutes, with the model converging as expected.
 The training loss, shown in the leftmost plot of \cref{fig:training_comparison}, follows a bit noisy downward trend, while the gradient norm exhibits significant fluctuations but also trends downards over time.
 
-Similarly, \DeepSeek{} was fine-tuned under the same setup, with its training loss shown in the middle plot of \cref{fig:training_comparison}. The loss curve behaves similarly to \Alpaca{}, confirming stable convergence, though the gradient norm remains similarly volatile throughout training.
+Similarly, \modeldeepseek was fine-tuned under the same setup, with its training loss shown in the middle plot of \cref{fig:training_comparison}. The loss curve behaves similarly to \modelalpaca, confirming stable convergence, though the gradient norm remains similarly volatile throughout training.
 The decreasing trend in gradient norm suggests that while updates remain unstable at each step, their overall magnitude diminishes as training progresses, indicating a gradual refinement of the optimization process.
 
 The final comparison, shown in the rightmost plot of \cref{fig:training_comparison}, demonstrates that both models achieve nearly identical loss trajectories.
