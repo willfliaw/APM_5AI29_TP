@@ -292,10 +292,18 @@ the top-m candidate entities, producing an ordered list \(R_{LLM}\),
 which replaces the top-m results from the retriever to generate the 
 final answer.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model.001.png}
+    \caption{KoPA Architecture \cite{qin2023kopa}}
+    \label{fig:KoPAarchitecture}
+\end{figure}
+
 \subsection{KoPA}
 \label{sec:method:kopa}
 Unlike KICGPT, KoPA integrates the structural information of
-the KG into the LLM as an input. KoPA comprises two main components: structural
+the KG into the LLM as an input. As can be seen in Figure \ref{fig:KoPAarchitecture}, 
+KoPA comprises two main components: structural
 embedding and knowledge prefix adapter.
 
 \subsubsection{Structural Embedding}
