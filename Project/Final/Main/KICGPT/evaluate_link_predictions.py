@@ -1,53 +1,44 @@
 import numpy as np
 
-def load_predictions(chat_log_path):
+
+def load_predictions_and_ground_truth(chat_log_path):
     """
-    Parses `chat_tail.txt` and extracts the full ranked list of model predictions.
+    Parses `chat_tail.txt` to extract ranked predictions and ground-truth answers.
 
     Returns:
-    - `predictions`: List of ranked lists of candidate answers.
+    - `predictions`: List of ranked lists (text format)
+    - `ground_truths`: List of correct answers (text format)
     """
-    predictions = []
+    predictions, ground_truths = [], []
 
     with open(chat_log_path, "r") as file:
         lines = file.readlines()
 
     for line in lines:
         if line.startswith("Answers: "):
-            ranked_list = line.strip().split("Answers: ")[1].strip().split(" | ")  # Now correctly extracting candidates
+            ranked_list = line.strip().split("Answers: ")[1].strip().split(" | ")
             predictions.append(ranked_list)
+        elif line.startswith("Ground Truth: "):
+            ground_truths.append(line.strip().split("Ground Truth: ")[1].strip())
 
-    return predictions
+    return predictions, ground_truths
 
-def evaluate_link_prediction_from_log(chat_log_path, test_data, k_list=[1, 3, 10]):
+
+def evaluate_predictions(chat_log_path, k_list=[1, 3, 10]):
     """
-    Evaluates link prediction using stored ranked lists from `chat_tail.txt`.
+    Evaluates link prediction accuracy by comparing ranked predictions with ground truth.
 
     Metrics:
     - Hits@K
     - Mean Rank (MR)
     - Mean Reciprocal Rank (MRR)
-
-    :param chat_log_path: Path to `chat_tail.txt`
-    :param test_data: List of ground-truth triplets
-    :param k_list: List of `K` values for Hits@K
     """
-    predictions = load_predictions(chat_log_path)
+    predictions, ground_truths = load_predictions_and_ground_truth(chat_log_path)
 
     ranks = []
     hits_at_k = {k: 0 for k in k_list}
 
-    for idx, sample in enumerate(test_data):
-        question = sample["Question"]
-        true_answer = sample["Answer"]
-
-        # Ensure we have a full ranking for this test case
-        if idx >= len(predictions):
-            print(f"Warning: Missing prediction for index {idx}, skipping.")
-            continue
-
-        ranked_candidates = predictions[idx]  # Full ranked list
-
+    for idx, (ranked_candidates, true_answer) in enumerate(zip(predictions, ground_truths)):
         # Get the rank of the true answer
         if true_answer in ranked_candidates:
             rank = ranked_candidates.index(true_answer) + 1  # 1-based index
@@ -62,7 +53,7 @@ def evaluate_link_prediction_from_log(chat_log_path, test_data, k_list=[1, 3, 10
                 hits_at_k[k] += 1
 
     # Compute final metrics
-    num_samples = len(test_data)
+    num_samples = len(ground_truths)
     mean_rank = np.mean(ranks)
     mrr = np.mean([1.0 / r for r in ranks])
 
@@ -78,14 +69,5 @@ def evaluate_link_prediction_from_log(chat_log_path, test_data, k_list=[1, 3, 10
 
 
 if __name__ == '__main__':
-    dataset = "wn18rr"
-
-    # Load test dataset
-    with open("/Data/KICGPT/dataset/" + dataset + "/test_answer.txt", "r") as load_f:
-        test_triplet = json.load(load_f)
-
-    # Path to saved model outputs
-    chat_log_path = f"./outputs/{dataset}/chat_tail.txt"
-
-    # Evaluate using saved predictions
-    results = evaluate_link_prediction_from_log(chat_log_path, test_triplet[:2])
+    chat_log_path = "./outputs/wn18rr/chat_tail.txt"
+    results = evaluate_predictions(chat_log_path)

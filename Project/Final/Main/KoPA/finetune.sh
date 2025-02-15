@@ -1,0 +1,13 @@
+CUDA_VISIBLE_DEVICES=0 nohup python3 finetune_kopa.py \
+    --base_model "NEU-HAI/Llama-2-7b-alpaca-cleaned" \
+    --data_path "data/CoDeX-S-train.json" \
+    --output_dir "lora-Llama-2-7b-alpaca-cleaned" \
+    --num_epochs 3 \
+    --lora_r 64 \
+    --learning_rate 2e-4 \
+    --batch_size 16 \
+    --micro_batch_size 4 \
+    --num_prefix 1 \
+    --cutoff_len 2048 \
+    --lora_target_modules '["q_proj","v_proj"]' \
+    --kge_model "data/CoDeX-S-rotate.pth" > log.txt &
