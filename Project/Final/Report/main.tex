@@ -93,6 +93,12 @@
     frame=single
 }
 
+
+\newcommand{\modelministral}{Ministral-8B}
+\newcommand{\modelalpaca}{Alpaca-7B}
+\newcommand{\modeldeepseek}{R1-Distill-8B}
+
+
 \begin{document}
 
 \begin{center}
@@ -132,6 +138,8 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 \begin{center}
     \section*{Knowledge Graph Completion}
 \end{center}
+
+\todo{Maybe abstract?}
 
 % ---------------------------------------------------------
 %
@@ -176,14 +184,6 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 % ---------------------------------------------------------
 
 \section{Experiments}\label{sec:experiments}
-
-\todo{Maybe shortly explain dataset?}
-\todo{Introduce models, R1, Alpacca and Mistral}
-\todo{maybe QUICKLY intro metrics, however should be known already}
-
-\todo{Performance of KICGPT}
-
-\todo{Performance of KoPA}
 
 \begin{figure}
     \centering
@@ -270,9 +270,42 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 
     \caption{Training performance comparison of DeepSeek and Alpaca models.
         (a) and (b) show loss and gradient norm trends separately for each model,
-        while (c) compares both losses for direct convergence analysis.}
-    \label{fig:groupplot_example}
+        while (c) compares both losses for direct convergence analysis. \todo{fix description}}
+    \label{fig:training_comparison}
 \end{figure}
+
+
+\todo{Maybe shortly explain dataset?}
+\todo{maybe QUICKLY intro metrics, however should be known already}
+
+\subsection{Concise Model Summaries}
+
+We use three models for our experiments:
+Alpaca-7B~\cite{taori2023stanford} is a fine-tuned LLaMA 7B model designed for instruction-following tasks, trained on 52,000 examples generated via OpenAI’s text-davinci-003.
+Ministral-8B-Instruct-2410~\cite{mistralai2024ministral8b} is an 8-billion-parameter model fine-tuned for instruction tasks, featuring a 128k context window and multilingual support, outperforming similar-sized models.
+Compared to Alpaca, Ministral-8B benefits from a larger model size, an extended context window, and broader multilingual capabilities.
+DeepSeek-R1-Distill-Llama-8B~\cite{deepseekai2025deepseekr1distillllama8b} is an 8-billion-parameter model distilled from DeepSeek-R1~\cite{guo2025deepseek}, focusing on reasoning and problem-solving, particularly excelling in math and code tasks.
+
+All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU with 24 GiB of VRAM, paired with an Intel Xeon W-1270P CPU running at 3.80 GHz and 64 GB of RAM.
+
+\todo{Performance of KICGPT}
+
+Following the procedure outlined in~\cref{sec:methodology}, we finedtuned \modelalpaca on CoDeX~\cite{safavi2020codex} dataset.
+This process took 10 Hours and 12 Minutes, with very consistent
+
+\todo{very unhappy with this, we need to write somethign like this}
+Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \modelalpaca on the CoDeX~\cite{safavi2020codex} dataset.
+This process took 10 hours and 12 minutes, with the model converging as expected.
+The training loss, shown in the leftmost plot of \cref{fig:training_comparison}, follows a bit noisy downward trend, while the gradient norm exhibits significant fluctuations but also trends downards over time.
+
+Similarly, \DeepSeek{} was fine-tuned under the same setup, with its training loss shown in the middle plot of \cref{fig:training_comparison}. The loss curve behaves similarly to \Alpaca{}, confirming stable convergence, though the gradient norm remains similarly volatile throughout training.
+The decreasing trend in gradient norm suggests that while updates remain unstable at each step, their overall magnitude diminishes as training progresses, indicating a gradual refinement of the optimization process.
+
+The final comparison, shown in the rightmost plot of \cref{fig:training_comparison}, demonstrates that both models achieve nearly identical loss trajectories.
+So we would expect them to perform similarly.
+
+\todo{eval of deepseek and alpacca}
+
 
 % ---------------------------------------------------------
 %
@@ -297,9 +330,6 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 \section{Conclusion and Future Work}\label{sec:conclusion-and-future-work}
 \todo{TBD otherwise leave out}
 \todo{Summarize the key findings and how they link back to your problem statement. Suggest improvements or next steps (e.g., new dataset, advanced fusion technique, or GNN-based approach). Highlight what you learned and what remains challenging.}
-
-\todo{fix this}
-In \cref{fig:groupplot_example} we do something very cool.\cite{hetionet}
 
 \bibliography{main}
 
