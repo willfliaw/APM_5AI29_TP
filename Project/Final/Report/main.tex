@@ -193,15 +193,41 @@ Alternatively, \textbf{KoPA} \cite{qin2023kopa} employs a \textit{Knowledge Pref
 \todo{Another ultra fancy picture}
 \todo{it might be hard to seperate this from the previous section, however it should be possible, if not we can also fuse them, but it might hinder readability since we keep jumping all over the place (cause other papers are required for background)}
 
-In this project, we focus on link prediction task for knowledge graphs 
-(KGs). Given incomplete triple in a KG \((h, r, ?)\) or \((?, r, t)\), 
+In this project, we  focus on LLM-based KGC and explore two different 
+state-of-the-art approaches: link prediction with KICGPT
+and triple classification with KoPA. 
+While these tasks differ, they share a fundamental idea where both
+methods use LLMs to assess and predict entity relationships 
+in a KG. KICGPT tackles link prediction using prompt engineering, 
+where demonstrations help guide the LLM in predicting missing entities. 
+Meanwhile, KoPA employs fine-tuning and embed structural information 
+as a prefix of LLM input performs triple classification to determine the 
+correctness of a given triple. However, at its core, KoPA also relies 
+on link prediction, as the LLM implicitly evaluates whether the 
+connection in the triple is plausible or not. The key difference 
+lies in execution: KICGPT predicts missing entities, while KoPA 
+predicts the validity of an existing triple by assessing whether 
+the inferred link is correct.
+
+% Both approaches leverage LLMs to enhance KGC performance, 
+% but differ in their integration strategies. KICGPT adopts a prompt 
+% engineering approach, using demonstrations to guide LLM reasoning, 
+% while KoPA employs fine-tuning and embed structural information as a prefix of LLM input.
+
+For link prediction task, given an incomplete triple in a KG \((h, r, ?)\) or \((?, r, t)\), 
 the goal is to predict the missing entity, either it is head \(h\) 
 or tail \(t\), where \(h, t \in E\) and \(r \in R\), E denotes set of 
-entities, R denotes set of relations. The model that we used follows 
-KICGPT \cite{wei2023kicgpt} with modification on the LLM used. 
+entities, R denotes set of relations. For the triple classification task, 
+the objective is to determine the correctness of the triple given an input 
+triple from a KG by comparing it with the ground truth.
+The model that we used follows 
+KICGPT \cite{wei2023kicgpt} and KoPA \cite{qin2023kopa} with modification on the LLM backbone. 
 
-\subsection{Architecture}
-\label{sec:method:architecture}
+\subsection{KICGPT}
+\label{sec:method:kicgpt}
+
+% \subsection{Architecture}
+% \label{sec:method:architecture}
 
 \begin{figure}
     \centering
@@ -266,6 +292,44 @@ the top-m candidate entities, producing an ordered list \(R_{LLM}\),
 which replaces the top-m results from the retriever to generate the 
 final answer.
 
+\subsection{KoPA}
+\label{sec:method:kopa}
+Unlike KICGPT, KoPA integrates the structural information of
+the KG into the LLM as an input. KoPA comprises two main components: structural
+embedding and knowledge prefix adapter.
+
+\subsubsection{Structural Embedding}
+KoPA captures structural information through self-supervised 
+structural embedding pre-training rather than adding neighborhood 
+text to the input. Each entity \(e \in E\)  and relation \(r \in R\)  
+is assigned a structural embedding, \(\mathbf{e} \in {R}^{d_e}\)  
+and \(\mathbf{r} \in {R}^{d_r}\), mapped into the 
+LLM's textual space.
+
+To measure triple plausibility, KoPA follows the embedding-based 
+KGC paradigm by defining a score function \(F(h, r, t)\). 
+It optimizes structural embeddings using negative sampling 
+in a self-supervised pre-training process. By minimizing the 
+pre-training loss, the model captures subgraph structures and 
+relational patterns, aligning entity and relation representations 
+with KG structures.
+
+\subsubsection{Knowledge Prefix Adapter}
+After pre-training, the structural embeddings \((h, r, t)\) encode 
+KG information but exist in a different space from the LLM's textual 
+representations. To bridge this gap, a knowledge prefix adapter \(P\) 
+projects these embeddings into the LLM's token space by converting 
+them into virtual knowledge tokens (K):
+
+\begin{equation}
+    K = P(\mathbf{h}) \oplus P(\mathbf{r}) \oplus P(\mathbf{t})
+\end{equation}
+
+These tokens are added as prefix of the input sequence. It allows
+the LLM to pay attention to structural information during fine-tuning 
+and inference. The adapter is trained while keeping embeddings 
+fixed to enable generalization to new triples, enrich textual 
+descriptions, and improve predictions.
 % ---------------------------------------------------------
 %
 % EXPERIMENTS
