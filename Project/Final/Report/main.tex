@@ -112,24 +112,24 @@
             \vspace{0cm} % without it, bugs, don't know why?
             \centerline{\includegraphics[width=\linewidth]{./images/tp-ipp}}
         }
-         & {
-                \vspace{0cm} % same here
-                \centering
-                \large
-                {\hfill February, 2025}
+        & {
+            \vspace{0cm} % same here
+            \centering
+            \large
+            {\hfill February, 2025}
 
-                \vspace*{.5cm}
-                \textbf{APM\_5AI29\_TP}
+            \vspace*{.5cm}
+            \textbf{APM\_5AI29\_TP}
 
-                \vspace*{.5cm}
-                \setstretch{1.5}
-                {\Large\textbf{Language Models and Structured Data}}
+            \vspace*{.5cm}
+            \setstretch{1.5}
+            {\Large\textbf{Language Models and Structured Data}}
 
-                \vspace*{.5cm}
-                Final Project Report
+            \vspace*{.5cm}
+            Final Project Report
 
-                \vspace*{1cm}
-        }    \\
+            \vspace*{1cm}
+        } \\
         \hline
     \end{tabular}
 \end{center}
@@ -157,6 +157,7 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 \todo{Be mathematically rigierous}
 
 % Knowledge Graph Completion (KGC) is a fundamental task in artificial intelligence aimed at addressing the inherent incompleteness of knowledge graphs (KGs). KGs represent real-world facts as structured triples of the form $(h, r, t)$, where $h$ (head entity) and $t$ (tail entity) are connected by a relation $r$. Despite their widespread use in search engines, recommendation systems, and question-answering applications, KGs suffer from missing information, necessitating the development of KGC techniques to predict missing elements and improve KG utility.
+
 
 \section{Problem Statement}\label{sec:problem}
 
@@ -237,7 +238,6 @@ Following the discussion in \cref{sec:background}, we now outline our methodolog
 Our work explores two complementary strategies: prompt-based tail prediction with KICGPT and fine-tuning-based triple classification with KoPA.
 While these approaches address different formulations of KGC, they both rely on the LLM’s ability to assess entity relationships and infer missing knowledge.
 
-
 \subsection{KICGPT: Prompt-Based Link Prediction}
 \label{sec:method:kicgpt}
 
@@ -245,7 +245,7 @@ KICGPT primarily consists of three components, as illustrated in \cref{fig:KICGP
 The final output of KICGPT combines the LLM’s refined ranking with the remaining entities from the retriever, yielding the final entity ranking:
 
 \[
-R_{\text{KICGPT}} = [e'_1, e'_2, ..., e'_m, e_{m+1}, ..., e_{|E|}].
+    R_{\text{KICGPT}} = [e'_1, e'_2, ..., e'_m, e_{m+1}, ..., e_{|E|}].
 \]
 
 \subsubsection{Knowledge Prompt Construction}
@@ -253,13 +253,13 @@ R_{\text{KICGPT}} = [e'_1, e'_2, ..., e'_m, e_{m+1}, ..., e_{|E|}].
 The Knowledge Prompt enables KICGPT to leverage in-context learning by integrating relevant KG information into the LLM’s input. The prompt is constructed from two pools of triples: the analogy pool \( D_a \) and the supplement pool \( D_s \). The analogy pool consists of triples that share the same relation \( r \) as the query, ensuring that the LLM is exposed to examples with similar relational structures:
 
 \[
-D_a = \{(e', r, e'') \in G \mid e', e'' \in E\}.
+    D_a = \{(e', r, e'') \in G \mid e', e'' \in E\}.
 \]
 
 The supplement pool contains triples where the head or tail entity matches the query's head entity \( h \), providing additional entity-specific context:
 
 \[
-D_s = \{(h, r', e') \in G \mid r' \in R, e' \in E\} \cup \{(e', r', h) \in G \mid r' \in R, e' \in E\}.
+    D_s = \{(h, r', e') \in G \mid r' \in R, e' \in E\} \cup \{(e', r', h) \in G \mid r' \in R, e' \in E\}.
 \]
 
 To ensure that the most relevant demonstrations are selected, triples in \( D_s \) are ranked using BM25 scores, which measure textual similarity to the query entity description.
@@ -279,7 +279,6 @@ To effectively incorporate the selected examples, KICGPT transforms structured t
 \end{itemize}
 
 By combining retrieval-based entity ranking with structured in-context learning, KICGPT effectively integrates KG structure into the LLM’s reasoning process without requiring parameter updates. This hybrid approach allows for both flexibility and improved prediction accuracy, making it a powerful tool for link prediction in knowledge graphs.
-
 
 \subsection{KoPA: Fine-Tuning-Based Triple Classification}
 
@@ -329,24 +328,24 @@ The performance assessment uses standard metrics including accuracy, precision, 
     \begin{tikzpicture}
         % Group plot configuration
         \begin{groupplot}[
-                group style={
-                        group size=3 by 1,       % 3 plots in 1 row
-                        horizontal sep=0.3cm     % Adjust spacing between plots
-                    },
-                width=0.38\textwidth,        % Maximized plot width
-                ymode=log,                   % Log-scale y-axis for ALL plots
-                xmin=0, xmax=3,              % Unified x-axis range
-                ymin=1e-3, ymax=1,           % Unified y-axis range across all plots
-                xlabel=Epoch,
-                xtick distance=0.5,          % Uniform tick spacing
-                ytick distance=10,           % Log-scale tick separation
-                minor y tick num=9,          % Minor tick marks for readability
-            ]
+            group style={
+                group size=3 by 1,       % 3 plots in 1 row
+                horizontal sep=0.3cm     % Adjust spacing between plots
+            },
+            width=0.38\textwidth,        % Maximized plot width
+            ymode=log,                   % Log-scale y-axis for ALL plots
+            xmin=0, xmax=3,              % Unified x-axis range
+            ymin=1e-3, ymax=1,           % Unified y-axis range across all plots
+            xlabel=Epoch,
+            xtick distance=0.5,          % Uniform tick spacing
+            ytick distance=10,           % Log-scale tick separation
+            minor y tick num=9,          % Minor tick marks for readability
+        ]
 
             %------------- Plot (a) Alpaca -----------------
             \nextgroupplot[
                 title=\modelalpaca,
-                % Hide y-axis labels for alignment
+            % Hide y-axis labels for alignment
                 ylabel=Loss
             ]
             \addplot[smooth, thick, blue]
@@ -415,30 +414,30 @@ The performance assessment uses standard metrics including accuracy, precision, 
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-                ybar,
-                bar width=12pt,
-                symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
-                xtick=data,
-                ymin=0,
-                ymax=0.7,
-                ylabel={Score},
-                width=12cm,
-                height=7cm,
-                grid=both,
-                major grid style={line width=.2pt, draw=gray!30},
-                minor grid style={draw=gray!10},
-                enlarge x limits=0.2,
-                % Legend placed below with spacing:
-                legend style={
-                        at={(0.5,-0.15)},
-                        anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3,
-                        draw=none, % Remove box
-                        fill=none,
-                        font=\small
-                    }
-            ]
+            ybar,
+            bar width=12pt,
+            symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+            xtick=data,
+            ymin=0,
+            ymax=0.7,
+            ylabel={Score},
+            width=12cm,
+            height=7cm,
+            grid=both,
+            major grid style={line width=.2pt, draw=gray!30},
+            minor grid style={draw=gray!10},
+            enlarge x limits=0.2,
+        % Legend placed below with spacing:
+            legend style={
+                at={(0.5,-0.15)},
+                anchor=north,
+                /tikz/every even column/.append style={column sep=10pt},
+                legend columns=3,
+                draw=none, % Remove box
+                fill=none,
+                font=\small
+            }
+        ]
 
             % Bars
             \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
@@ -455,93 +454,117 @@ The performance assessment uses standard metrics including accuracy, precision, 
 \end{figure}
 
 
-\todo{Maybe shortly explain dataset?}
 \todo{maybe QUICKLY intro metrics, however should be known already}
 
 \subsection{Datasets}
 
-For our experiments, we employed two widely used benchmarks for KGC, with their statistics provided in \cref{tab:datasets}.
+For our experiments, we used two widely adopted KGC benchmarks, summarized in \cref{tab:datasets}.
 
-\textbf{WN18RR} is a refined version of the WN18 dataset \cite{wn18rr}, derived from WordNet \cite{wordnet}. It was introduced to address data leakage issues in WN18 by removing inverse relations that made link prediction tasks trivial. Due to the removal of these redundant relations, WN18RR presents a more challenging benchmark for knowledge graph completion, requiring models to generalize beyond simple pattern memorization.
+\paragraph{WN18RR} is a filtered version of WN18~\cite{wn18rr}, derived from WordNet~\cite{wordnet}, designed to eliminate inverse relations that previously made link prediction trivial.
+This refinement increases task difficulty, requiring models to generalize beyond simple pattern recognition.
 
-\textbf{CoDeX-S} (Complex Dataset Extracted from Wikidata \cite{wikidata}) is a subset of the CoDeX dataset \cite{codex}, designed to provide a more realistic and diverse set of relational facts. Unlike WN18RR, which is based on lexical semantics, CoDeX-S originates from Wikidata, leading to a rich and varied relational structure. Additionally, CoDeX-S has been curated to ensure a balanced distribution of relations, reducing the potential for biases found in many other knowledge graph datasets.
+\paragraph{CoDeX-S} (Complex Dataset Extracted from Wikidata~\cite{wikidata}) is a subset of CoDeX~\cite{safavi2020codex}, offering a diverse set of relational facts.
+Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikidata, ensuring a richer relational structure with a more balanced distribution of relations.
 
+\todo{fix labels, make them mathetmatical}
 \begin{table}[h]
     \centering
     \begin{tabular}{l c c c c c}
         \hline
         \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} & \textbf{\# train} & \textbf{\# valid} & \textbf{\# test} \\
         \hline
-        WN18RR           & 40,943          & 11              & 86,835            & 3,034             & 3,134            \\
-        CoDeX-S          & 2,034           & 42              & 32,888            & 3,654             & 3,654            \\
+        WN18RR & 40,943 & 11 & 86,835 & 3,034 & 3,134 \\
+        CoDeX-S & 2,034 & 42 & 32,888 & 3,654 & 3,654 \\
         \hline
     \end{tabular}
     \caption{Statistics of the datasets used in our experiments.}
     \label{tab:datasets}
 \end{table}
 
+\subsection{Language Models}
 
-\subsection{Concise Model Summaries}
+To evaluate model performance across different architectures, we consider three language models with distinct capabilities.
 
-We use three models for our experiments:
-Alpaca-7B~\cite{taori2023stanford} is a fine-tuned LLaMA 7B model designed for instruction-following tasks, trained on 52,000 examples generated via OpenAI's text-davinci-003.
-Ministral-8B-Instruct-2410~\cite{mistralai2024ministral8b} is an 8-billion-parameter model fine-tuned for instruction tasks, featuring a 128k context window and multilingual support, outperforming similar-sized models.
-Compared to Alpaca, Ministral-8B benefits from a larger model size, an extended context window, and broader multilingual capabilities.
-DeepSeek-R1-Distill-Llama-8B~\cite{deepseekai2025deepseekr1distillllama8b} is an 8-billion-parameter model distilled from DeepSeek-R1~\cite{guo2025deepseek}, focusing on reasoning and problem-solving, particularly excelling in math and code tasks.
+\paragraph{Alpaca-7B}~\cite{taori2023stanford} is a fine-tuned variant of LLaMA 7B, trained on 52,000 instruction-response pairs generated by OpenAI’s text-davinci-003.
+Optimized for general instruction-following, it serves as a lightweight baseline.
 
-All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU with 24 GiB of VRAM, paired with an Intel Xeon W-1270P CPU running at 3.80 GHz and 64 GB of RAM.
+\paragraph{Mistral-8B-Instruct-2410}~\cite{mistralai2024ministral8b} is an 8-billion-parameter model designed for instruction-based tasks, featuring a 128k-token context window and multilingual support.
+Compared to Alpaca-7B, it benefits from a slightly larger model size, extended context length, and improved cross-lingual capabilities.
+
+\paragraph{DeepSeek-R1-Distill-Llama-8B}~\cite{deepseekai2025deepseekr1distillllama8b} is a distilled version of DeepSeek-R1~\cite{guo2025deepseek}, optimized for reasoning and problem-solving.
+With a strong emphasis on mathematical and coding tasks, it is particularly effective in structured problem domains.
 
 
+\subsection{Evaluation of the KICGPT Approach}
 
-\todo{Performance of KICGPT}
+All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU with 24 GiB of VRAM, an Intel Xeon W-1270P CPU running at 3.80 GHz, and 64 GB of RAM.
 
-\todo{very unhappy with this, need to write somethign like this}
+As previously discussed, this approach does not require modifications to the models themselves.
+However, while the original implementation relied on the ChatGPT API, we adapted it to locally running models.
+Specifically, in \cref{fig:link_ordering} we evaluated \modelministral and \modeldeepseek, comparing their performance against the results reported by Wei et al.~\cite{wei2023kicgpt}.
+
+\modelministral followed prompt instructions closely and rarely produced unparsable output.
+However, it significantly underperformed compared to the original study,
+which we tentatively attribute to ChatGPT-3.5’s superior general knowledge and reasoning capabilities.
+
+\modeldeepseek demonstrated strong reasoning abilities inside its explicit thinking tags, effectively analyzing given options, recognizing patterns, and identifying preferable choices.
+However, this process was often excessively verbose, even when explicitly instructed to be concise.
+Additionally, it frequently truncated its final responses, replacing parts of the output with ellipses (\dots), likely due to a focus loss while reasoning about the problem.
+Moreover, \modeldeepseek sometimes disregarded specific prompt instructions, potentially because it is primarily tuned for mathematical and coding tasks.
+Since the full-size Deepseek-R1 model is known to suffer from degraded performance with few-shot prompting~\cite{guo2025deepseek}, a similar issue may affect this distilled variant.
+However, as the few-shot examples contain domain-specific information, removing them entirely could  also further reduce performance.
+
+Both models performed surprisingly on-par with ChatGPT in the Hits@10 evaluation.
+However, this is likely due to variations in output length rather than genuine ranking improvements.
+Since evaluation is based on the options generated by the LLM rather than the full ground-truth ranking, models that produce shorter responses inherently increase their chances of including the correct answer among the top-ranked candidates.
+
+
+\subsection{Evaluation of the KoPA Approach}
+
 Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \modelalpaca on the CoDeX~\cite{safavi2020codex} dataset.
-This process took 10 hours and 12 minutes, with the model converging as expected.
-The training loss, shown in the leftmost plot of \cref{fig:training_comparison}, follows a bit noisy downward trend, while the gradient norm exhibits significant fluctuations but also trends downwards over time.
+The process took 10 hours and 12 minutes, with the model converging as expected.
+As shown in \cref{fig:training_comparison}, the training loss follows a slightly noisy downward trend, while the gradient norm exhibits significant fluctuations but generally decreases over time.
 
-Similarly, \modeldeepseek was fine-tuned under the same setup, with its training loss shown in the middle plot of \cref{fig:training_comparison}.
-9h and 56 minutes.
-The loss curve behaves similarly to \modelalpaca, confirming stable convergence, though the gradient norm remains similarly volatile throughout training.
-The decreasing trend in gradient norm suggests that while updates remain unstable at each step, their overall magnitude diminishes as training progresses, indicating a gradual refinement of the optimization process.
+Using the same setup, \modeldeepseek was fine-tuned in 9 hours and 56 minutes.
+Its loss curve closely resembles that of \modelalpaca, confirming stable convergence, though the gradient norm remains similarly volatile.
+A direct comparison reveals that both models exhibit nearly identical loss trajectories, suggesting comparable performance.
 
-The final comparison, shown in the rightmost plot of \cref{fig:training_comparison}, demonstrates that both models achieve nearly identical loss trajectories.
-So we would expect them to perform similarly.
+This expectation is confirmed in \cref{fig:codex_evaluation}, where both models achieve similar results.
+Evaluation times were 52 minutes for \modelalpaca and 56 minutes for \modeldeepseek.
+However, both models lag behind the performance reported in the original paper, though the cause remains unclear.
+Notably, they heavily favor predicting \textit{True}, resulting in exceptionally high recall but lower precision.
 
-\todo{end of previous todo}
+An important limitation of this fine-tuning approach is that \modeldeepseek does not engage in reasoning, as it is trained to generate the correct answer in its first token.
+Allowing it to reason could potentially improve performance, but this would require a different fine-tuning methodology.
 
-\todo{evaluations results}
-
-52min alpa
-56min r1
 
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-                ybar,
-                bar width=12pt,
-                symbolic x coords={Accuracy, Precision, Recall, F1-score},
-                xtick=data,
-                ymin=0,
-                ymax=1,
-                ylabel={Score},
-                width=12cm,
-                height=7cm,
-                grid=both,
-                major grid style={line width=.2pt, draw=gray!30},
-                minor grid style={draw=gray!10},
-                enlarge x limits=0.2,
-                legend style={
-                        at={(0.5,-0.15)},
-                        anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3,
-                        draw=none,
-                        fill=none,
-                        font=\small
-                    }
-            ]
+            ybar,
+            bar width=12pt,
+            symbolic x coords={Accuracy, Precision, Recall, F1-score},
+            xtick=data,
+            ymin=0,
+            ymax=1,
+            ylabel={Score},
+            width=12cm,
+            height=7cm,
+            grid=both,
+            major grid style={line width=.2pt, draw=gray!30},
+            minor grid style={draw=gray!10},
+            enlarge x limits=0.2,
+            legend style={
+                at={(0.5,-0.15)},
+                anchor=north,
+                /tikz/every even column/.append style={column sep=10pt},
+                legend columns=3,
+                draw=none,
+                fill=none,
+                font=\small
+            }
+        ]
 
             % Bars
             \addplot[fill=gray]   coordinates {(Accuracy,0.8274)  (Precision,0.7791)  (Recall,0.9141)  (F1-score,0.8411)};
@@ -569,17 +592,11 @@ So we would expect them to perform similarly.
 \todo{TBD, only do if there is actual deeper meaning otherwise fuse with experiments}
 
 \todo{Interpret the results in a deeper way:
-    - Why did certain methods do better?
-    - Mention any error analysis or interesting observations.
+- Why did certain methods do better?
+- Mention any error analysis or interesting observations.
 }
 
-The link prediction performance of \modeldeepseek, \modelministral, and ChatGPT varies due to differences in inference behavior, decoding strategies, and instruction adherence.
 
-\modeldeepseek struggled to follow formatting constraints despite explicit prompts. It often produced verbose reasoning before generating answers and self-trimmed responses, sometimes omitting correct entities. This suggests a pretraining bias favoring exhaustive analysis, which conflicted with structured output requirements. Its decoding strategy prioritized information compression, reducing MRR and Hits@1 scores. The few-shot prompting setup may have worsened its tendency to "overthink," making precise, structured outputs harder to achieve.
-
-\modelministral performed better at instruction adherence and structured output than \modeldeepseek. It balanced reasoning depth with clarity but lacked ChatGPT's reranking optimizations, leading to lower MRR and weaker top-ranked predictions. While it ranked entities more consistently, its Hits@10 score lagged slightly, indicating fewer retrieved correct entities overall. Nonetheless, its superior instruction-following made it more effective than \modeldeepseek for structured tasks.
-
-ChatGPT outperformed both models, excelling in instruction adherence and ranking precision due to RLHF and advanced reranking heuristics. It avoided \modeldeepseek's verbosity and \modelministral's retrieval inefficiencies, yielding higher MRR, Hits@1, and Hits@3 scores. Its ability to dynamically contextualize information in few-shot settings further improved entity predictions, making it the most effective model for knowledge graph completion.
 
 % ---------------------------------------------------------
 %
