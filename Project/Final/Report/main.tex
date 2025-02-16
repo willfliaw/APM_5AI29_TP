@@ -112,24 +112,24 @@
             \vspace{0cm} % without it, bugs, don't know why?
             \centerline{\includegraphics[width=\linewidth]{./images/tp-ipp}}
         }
-        & {
-            \vspace{0cm} % same here
-            \centering
-            \large
-            {\hfill February, 2025}
+         & {
+                \vspace{0cm} % same here
+                \centering
+                \large
+                {\hfill February, 2025}
 
-            \vspace*{.5cm}
-            \textbf{APM\_5AI29\_TP}
+                \vspace*{.5cm}
+                \textbf{APM\_5AI29\_TP}
 
-            \vspace*{.5cm}
-            \setstretch{1.5}
-            {\Large\textbf{Language Models and Structured Data}}
+                \vspace*{.5cm}
+                \setstretch{1.5}
+                {\Large\textbf{Language Models and Structured Data}}
 
-            \vspace*{.5cm}
-            Final Project Report
+                \vspace*{.5cm}
+                Final Project Report
 
-            \vspace*{1cm}
-        } \\
+                \vspace*{1cm}
+        }    \\
         \hline
     \end{tabular}
 \end{center}
@@ -157,7 +157,7 @@ Knowledge Graph Completion (KGC) aims to infer missing facts in a knowledge grap
 A KG consists of entities, relations, and triples of the form \( (h, r, t) \), where \( h \) (head) and \( t \) (tail) are connected by relation \( r \).
 Due to the inherent incompleteness of KGs, KGC seeks to either predict missing entities or verify candidate triples.
 
-While KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
+Although KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
 In this work, we consider two complementary tasks: \emph{link prediction} and \emph{triple classification}.
 This distinction arises from the differing nature of the evaluated approaches.
 While they could be adapted to a unified setting, doing so would require substantial modifications that could alter their original design.
@@ -167,6 +167,7 @@ Link prediction involves inferring a missing entity in an incomplete triple. Giv
 
 \paragraph{Triple Classification}
 Triple classification assesses whether a given triple \( (h, r, t) \) is valid. Instead of ranking candidates, the model outputs a binary decision indicating whether the relationship holds.
+\\
 
 By considering both tasks, we evaluate KGC models from two perspectives: predictive ranking and explicit fact verification.
 
@@ -327,24 +328,24 @@ The performance assessment uses standard metrics including accuracy, precision, 
     \begin{tikzpicture}
         % Group plot configuration
         \begin{groupplot}[
-            group style={
-                group size=3 by 1,       % 3 plots in 1 row
-                horizontal sep=0.3cm     % Adjust spacing between plots
-            },
-            width=0.38\textwidth,        % Maximized plot width
-            ymode=log,                   % Log-scale y-axis for ALL plots
-            xmin=0, xmax=3,              % Unified x-axis range
-            ymin=1e-3, ymax=1,           % Unified y-axis range across all plots
-            xlabel=Epoch,
-            xtick distance=0.5,          % Uniform tick spacing
-            ytick distance=10,           % Log-scale tick separation
-            minor y tick num=9,          % Minor tick marks for readability
-        ]
+                group style={
+                        group size=3 by 1,       % 3 plots in 1 row
+                        horizontal sep=0.3cm     % Adjust spacing between plots
+                    },
+                width=0.38\textwidth,        % Maximized plot width
+                ymode=log,                   % Log-scale y-axis for ALL plots
+                xmin=0, xmax=3,              % Unified x-axis range
+                ymin=1e-3, ymax=1,           % Unified y-axis range across all plots
+                xlabel=Epoch,
+                xtick distance=0.5,          % Uniform tick spacing
+                ytick distance=10,           % Log-scale tick separation
+                minor y tick num=9,          % Minor tick marks for readability
+            ]
 
             %------------- Plot (a) Alpaca -----------------
             \nextgroupplot[
                 title=\modelalpaca,
-            % Hide y-axis labels for alignment
+                % Hide y-axis labels for alignment
                 ylabel=Loss
             ]
             \addplot[smooth, thick, blue]
@@ -413,30 +414,30 @@ The performance assessment uses standard metrics including accuracy, precision, 
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-            ybar,
-            bar width=12pt,
-            symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
-            xtick=data,
-            ymin=0,
-            ymax=0.7,
-            ylabel={Score},
-            width=12cm,
-            height=7cm,
-            grid=both,
-            major grid style={line width=.2pt, draw=gray!30},
-            minor grid style={draw=gray!10},
-            enlarge x limits=0.2,
-        % Legend placed below with spacing:
-            legend style={
-                at={(0.5,-0.15)},
-                anchor=north,
-                /tikz/every even column/.append style={column sep=10pt},
-                legend columns=3,
-                draw=none, % Remove box
-                fill=none,
-                font=\small
-            }
-        ]
+                ybar,
+                bar width=12pt,
+                symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+                xtick=data,
+                ymin=0,
+                ymax=0.7,
+                ylabel={Score},
+                width=12cm,
+                height=7cm,
+                grid=both,
+                major grid style={line width=.2pt, draw=gray!30},
+                minor grid style={draw=gray!10},
+                enlarge x limits=0.2,
+                % Legend placed below with spacing:
+                legend style={
+                        at={(0.5,-0.15)},
+                        anchor=north,
+                        /tikz/every even column/.append style={column sep=10pt},
+                        legend columns=3,
+                        draw=none, % Remove box
+                        fill=none,
+                        font=\small
+                    }
+            ]
 
             % Bars
             \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
@@ -470,10 +471,10 @@ Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikid
     \centering
     \begin{tabular}{l c c c c c}
         \hline
-        \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} & \textbf{\# train} & \textbf{\# valid} & \textbf{\# test} \\
+        \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} & \textbf{\# Train} & \textbf{\# Valid} & \textbf{\# Test} \\
         \hline
-        WN18RR & 40,943 & 11 & 86,835 & 3,034 & 3,134 \\
-        CoDeX-S & 2,034 & 42 & 32,888 & 3,654 & 3,654 \\
+        WN18RR           & 40,943               & 11                    & 86,835            & 3,034             & 3,134            \\
+        CoDeX-S          & 2,034                & 42                    & 32,888            & 3,654             & 3,654            \\
         \hline
     \end{tabular}
     \caption{Statistics of the datasets used in our experiments.}
@@ -541,29 +542,29 @@ Allowing it to reason could potentially improve performance, but this would requ
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-            ybar,
-            bar width=12pt,
-            symbolic x coords={Accuracy, Precision, Recall, F1-score},
-            xtick=data,
-            ymin=0,
-            ymax=1,
-            ylabel={Score},
-            width=12cm,
-            height=7cm,
-            grid=both,
-            major grid style={line width=.2pt, draw=gray!30},
-            minor grid style={draw=gray!10},
-            enlarge x limits=0.2,
-            legend style={
-                at={(0.5,-0.15)},
-                anchor=north,
-                /tikz/every even column/.append style={column sep=10pt},
-                legend columns=3,
-                draw=none,
-                fill=none,
-                font=\small
-            }
-        ]
+                ybar,
+                bar width=12pt,
+                symbolic x coords={Accuracy, Precision, Recall, F1-score},
+                xtick=data,
+                ymin=0,
+                ymax=1,
+                ylabel={Score},
+                width=12cm,
+                height=7cm,
+                grid=both,
+                major grid style={line width=.2pt, draw=gray!30},
+                minor grid style={draw=gray!10},
+                enlarge x limits=0.2,
+                legend style={
+                        at={(0.5,-0.15)},
+                        anchor=north,
+                        /tikz/every even column/.append style={column sep=10pt},
+                        legend columns=3,
+                        draw=none,
+                        fill=none,
+                        font=\small
+                    }
+            ]
 
             % Bars
             \addplot[fill=gray]   coordinates {(Accuracy,0.8274)  (Precision,0.7791)  (Recall,0.9141)  (F1-score,0.8411)};
@@ -591,8 +592,8 @@ Allowing it to reason could potentially improve performance, but this would requ
 \todo{TBD, only do if there is actual deeper meaning otherwise fuse with experiments}
 
 \todo{Interpret the results in a deeper way:
-- Why did certain methods do better?
-- Mention any error analysis or interesting observations.
+    - Why did certain methods do better?
+    - Mention any error analysis or interesting observations.
 }
 
 
