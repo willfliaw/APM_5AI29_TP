@@ -61,7 +61,6 @@
 % ------------------------------------------------------------------
 
 \usepackage{listings}
-\usepackage{cleveref}
 
 % needs sheel escape activated
 % --shell-escape
@@ -96,6 +95,8 @@
 
 \usepackage{xspace}
 \usepackage{amsmath}
+\usepackage{cleveref}
+
 \usepackage{amsfonts}
 \newcommand{\modelministral}{Ministral-8B\xspace}
 \newcommand{\modelalpaca}{Alpaca-7B\xspace}
@@ -304,12 +305,17 @@ This approach ensures that the model retains relational constraints while mainta
 Unlike fully fine-tuned KG embeddings, which modify the LLM’s internal parameters, the prefix adapter enables lightweight structural integration without overfitting to specific KG schemas.
 
 \subsubsection{Fine-Tuning and Classification}
-\todo{g(h, r, t) does not exist, validity of paragraph?}
-KoPA is trained on a dataset of valid and invalid triples to optimize its ability to distinguish factual from incorrect knowledge.
-Given an input triple \( (h, r, t) \), the model computes a classification score \( g(h, r, t) \), indicating the likelihood that the triple is valid.
-The knowledge prefix adapter ensures that the LLM considers both explicit KG structure and learned textual reasoning when making classification decisions.
-This hybrid approach leverages the strengths of structured embeddings while retaining the adaptability of large-scale LLMs.
+% \todo{g(h, r, t) does not exist, validity of paragraph?}
+% KoPA is trained on a dataset of valid and invalid triples to optimize its ability to distinguish factual from incorrect knowledge.
+% Given an input triple \( (h, r, t) \), the model computes a classification score \( g(h, r, t) \), indicating the likelihood that the triple is valid.
+% The knowledge prefix adapter ensures that the LLM considers both explicit KG structure and learned textual reasoning when making classification decisions.
+% This hybrid approach leverages the strengths of structured embeddings while retaining the adaptability of large-scale LLMs.
 
+The knowledge prefix and the textual input are jointly processed by the LLM, 
+which predicts the validity of the input triple based on the combined information. 
+The LLM is fine-tuned on the instruction-following task to optimize its triple classification accuracy. 
+KoPA's evaluation focuses on its ability to correctly classify valid and invalid triples as a binary classification task. 
+The performance assessment uses standard metrics including accuracy, precision, recall, and F1-score.
 % ---------------------------------------------------------
 %
 % EXPERIMENTS
