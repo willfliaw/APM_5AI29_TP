@@ -38,8 +38,8 @@ class ChatGPT:
 
         hf_token_file = "token.txt"
         hf_token = read_hf_token(hf_token_file)
-        # llm_name = "mistralai/Ministral-8B-Instruct-2410"
-        llm_name = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+        llm_name = "mistralai/Ministral-8B-Instruct-2410"
+        # llm_name = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
         args.reasoning = True
 
         # Use 4-bit quantization and enable cuDNN benchmark for performance
@@ -425,7 +425,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
-    args.debug_online = False
+    args.debug_online = True
 
     with open(f"/Data/KICGPT/dataset/{args.dataset}/test_answer.txt", "r") as load_f:
         test_triplet = json.load(load_f)

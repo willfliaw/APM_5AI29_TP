@@ -69,5 +69,5 @@ def evaluate_predictions(chat_log_path, k_list=[1, 3, 10]):
 
 
 if __name__ == '__main__':
-    chat_log_path = "./outputs/wn18rr/chat_tail.txt"
+    chat_log_path = "./outputs/wn18rr_r1/chat_tail.txt"
     results = evaluate_predictions(chat_log_path)
