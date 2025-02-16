@@ -60,53 +60,34 @@
 \section{Problem Statement \& Background}
 %------------------------------------------------
 \begin{frame}{Problem Statement}
-    \begin{itemize}
-        \item Knowledge Graph Completion (KGC) aims to infer missing facts in a knowledge graph (KG).
-        \item A KG is defined as $G = (E, R, T)$ where:
-              \begin{itemize}
-                  \item $E$ is the set of entities
-                  \item $R$ is the set of relations
-                  \item $T \subseteq E \times R \times E$ represents valid triples
-              \end{itemize}
-        \item Two fundamental tasks:
-              \begin{itemize}
-                  \item \textbf{Link Prediction}: Predicting missing entities.
-                  \item \textbf{Triple Classification}: Determining validity of a triple.
-              \end{itemize}
-    \end{itemize}
-\end{frame}
+    \begin{block}{Knowledge Graph Completion (KGC)}
+        Aims to infer missing facts in a knowledge graph (KG), represented as \( G = (E, R, T) \).
+    \end{block}
 
-\begin{frame}{Background}
-    \begin{itemize}
-        \item Early approaches used embedding-based models:
-              \begin{itemize}
-                  \item TransE, DistMult, ComplEx.
-              \end{itemize}
-        \item Large Language Models (LLMs) improve KGC by leveraging:
-              \begin{itemize}
-                  \item In-context learning.
-                  \item Instruction tuning.
-              \end{itemize}
-        \item Two main strategies:
-              \begin{itemize}
-                  \item \textbf{Prompt-Based Methods} (e.g., KICGPT).
-                  \item \textbf{Fine-Tuning-Based Methods} (e.g., KoPA).
-              \end{itemize}
-    \end{itemize}
+    \begin{columns}[c]
+        \column{.45\textwidth}
+        KGC involves key tasks:
+        \begin{itemize}
+            \item \textbf{Link Prediction}: Identifying missing entities by ranking candidate tail entities in an incomplete triple \( (h, r, ?) \).
+            \item \textbf{Triple Classification}: Determining whether a given triple \( (h, r, t) \) is valid.
+        \end{itemize}
+        \column{.45\textwidth}
+        \\LLM-based primary approaches:
+        \begin{itemize}
+            \item \textbf{Prompt-Based Methods} \\(e.g., KICGPT \cite{wei2023kicgpt})\\ Utilize structured retrieval and in-context learning for entity ranking.
+            \item \textbf{Fine-Tuning-Based Methods} \\(e.g., KoPA \cite{qin2023kopa})\\ Integrate structured knowledge into LLMs via additional training.
+        \end{itemize}
+    \end{columns}
 \end{frame}
 
 %------------------------------------------------
 \section{Methodology}
 %------------------------------------------------
-\begin{frame}{KICGPT: Prompt-Based Link Prediction}
+\begin{frame}{KICGPT: Retrieval-Augmented Prompting}
     \begin{itemize}
-        \item Uses retrieval and ranking for entity prediction.
-        \item Steps:
-              \begin{itemize}
-                  \item Retrieve candidate entities.
-                  \item Use Knowledge Prompts to refine ranking.
-                  \item Final ranking by LLM-based reranking.
-              \end{itemize}
+        \item Retrieve candidate entities from the knowledge graph.
+        \item Generate Knowledge Prompts for in-context learning.
+        \item Perform reranking using a large language model.
     \end{itemize}
     \begin{figure}[h]
         \centering
@@ -114,7 +95,6 @@
         \caption{KICGPT Architecture}
     \end{figure}
 \end{frame}
-
 
 \begin{frame}{KoPA: Fine-Tuning-Based Triple Classification}
     \begin{itemize}
@@ -134,33 +114,37 @@
 \section{Experiments \& Discussion}
 %------------------------------------------------
 \begin{frame}{Experiments}
-    \begin{itemize}
-        \item Datasets: WN18RR and CoDeX-S.
-        \item Evaluation metrics:
-              \begin{itemize}
-                  \item Mean Reciprocal Rank (MRR), Hits@1, Hits@3, Hits@10.
-              \end{itemize}
-        \item Compared models: Alpaca-7B, Ministral-8B, R1-Distill-8B.
-    \end{itemize}
-    \begin{table}[h]
-        \centering
-        \begin{tabular}{l c c c c c}
-            \toprule
-            \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} & \textbf{\# train} & \textbf{\# valid} & \textbf{\# test} \\
-            \midrule
-            WN18RR           & 40,943               & 11                    & 86,835            & 3,034             & 3,134            \\
-            CoDeX-S          & 2,034                & 42                    & 32,888            & 3,654             & 3,654            \\
-            \bottomrule
-        \end{tabular}
-        \caption{Statistics of the datasets used in our experiments.}
-        \label{tab:datasets}
-    \end{table}
+    \begin{columns}[c]
+        \column{.45\textwidth}
+        Datasets: WN18RR and CoDeX-S.
+        \begin{table}[h]
+            \centering
+            \begin{tabular}{l c c c c c}
+                \toprule
+                \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} \\
+                \midrule
+                WN18RR           & 40,943               & 11                    \\
+                CoDeX-S          & 2,034                & 42                    \\
+                \bottomrule
+            \end{tabular}
+            \caption{Statistics of the datasets used in our experiments.}
+            \label{tab:datasets}
+        \end{table}
+
+        \column{.45\textwidth}
+        LLMs Compared:
+        \begin{itemize}
+            \item \textbf{\modelalpaca} – Fine-tuned for \textit{instruction-following} tasks.
+            \item \textbf{\modelministral} – Optimized for \textit{multilingual and long-context} scenarios.
+            \item \textbf{\modeldeepseek} – A distilled model with strong \textit{reasoning} capabilities.
+        \end{itemize}
+    \end{columns}
 \end{frame}
 
 \begin{frame}{Plots}
-    \begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
-
-        \column{.45\textwidth} % Left column and width
+    \begin{columns}[c]
+        \column{.45\textwidth}
+        Retrieval-Augmented Prompting
         \begin{figure}[ht]
             \centering
             \begin{tikzpicture}
@@ -171,7 +155,7 @@
                         xtick=data,
                         xticklabel style={rotate=30, anchor=east},
                         ymin=0,
-                        ymax=0.7,
+                        ymax=1,
                         ylabel={Score},
                         width=0.9\textwidth,
                         height=5cm,
@@ -205,7 +189,8 @@
             \label{fig:link_ordering}
         \end{figure}
 
-        \column{.45\textwidth} % Right column and width
+        \column{.45\textwidth}
+        Fine-Tuning-Based Triple Classification
         \begin{figure}[ht]
             \centering
             \begin{tikzpicture}
@@ -343,13 +328,7 @@
 \end{frame}
 
 \begin{frame}{Discussion}
-    \begin{itemize}
-        \item KICGPT improves ranking by leveraging structured prompts.
-              \begin{itemize}
-                  \item ChatGPT outperforms \modeldeepseek and \modelministral due to better reranking heuristics.
-              \end{itemize}
-        \item KoPA integrates KG embeddings effectively for classification.
-    \end{itemize}
+    TBD
 \end{frame}
 
 %------------------------------------------------
@@ -359,84 +338,10 @@
     TBD
 \end{frame}
 
-% TEMPLATE STARTS HERE...
-
-%------------------------------------------------
-\section{First Section}
-%------------------------------------------------
-
-\begin{frame}{Bullet Points}
-    \begin{itemize}
-        \item Lorem ipsum dolor sit amet, consectetur adipiscing elit
-        \item Aliquam blandit faucibus nisi, sit amet dapibus enim tempus eu
-        \item Nulla commodo, erat quis gravida posuere, elit lacus lobortis est, quis porttitor odio mauris at libero
-        \item Nam cursus est eget velit posuere pellentesque
-        \item Vestibulum faucibus velit a augue condimentum quis convallis nulla gravida
-    \end{itemize}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}{Blocks of Highlighted Text}
-    In this slide, some important text will be \alert{highlighted} because it's important. Please, don't abuse it.
-
-    \begin{block}{Block}
-        Sample text
-    \end{block}
-
-    \begin{alertblock}{Alertblock}
-        Sample text in red box
-    \end{alertblock}
-
-    \begin{examples}
-        Sample text in green box. The title of the block is ``Examples".
-    \end{examples}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}{Multiple Columns}
-    \begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
-
-        \column{.45\textwidth} % Left column and width
-        \textbf{Heading}
-        \begin{enumerate}
-            \item Statement
-            \item Explanation
-            \item Example
-        \end{enumerate}
-
-        \column{.45\textwidth} % Right column and width
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
-
-    \end{columns}
-\end{frame}
-
-%------------------------------------------------
-\section{Second Section}
-%------------------------------------------------
-
-\begin{frame}{Theorem}
-    \begin{theorem}[Mass--energy equivalence]
-        $E = mc^2$
-    \end{theorem}
-\end{frame}
-
-\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-    \frametitle{Citation}
-    An example of the \verb|\cite| command to cite within the presentation:\\~
-
-    This statement requires citation \cite{p1}.
-\end{frame}
-
-%------------------------------------------------
-
 \begin{frame}{References}
     \footnotesize
     \bibliography{reference.bib}
     \bibliographystyle{apalike}
 \end{frame}
-
-%----------------------------------------------------------------------------------------
 
 \end{document}
