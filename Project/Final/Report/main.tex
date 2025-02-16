@@ -25,7 +25,8 @@
 
 % APA Style
 \usepackage{cite}
-\bibliographystyle{apalike}
+%\bibliographystyle{apalike}
+\bibliographystyle{ieeetr}
 
 \renewcommand\refname{Bibliography}
 
@@ -162,26 +163,37 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 
 
 \section{Background}\label{sec:background}
-\todo{Disguise for related work, however it should not look like related work. What has to be done here is to QUICKLY introduce classical models, then go over to the distingsion we are going to draw which is fine tuning vs. pure promt engineering. This clear distingsion does not exist, but we will pretend}
-\todo{Talk about Prompt engineering, speciaially KICGPT, throw in a couple of other papers for additional BaCkGrOuND and find a reason why we choose KICGPT}
-\todo{Same for KoPA}
-\todo{VERY BRIEF general comparison of approaches}
 
-Early KGC research centered on triple-based models using embedding methods to represent entities and relations in a continuous vector space. TransE \cite{bordes2013translating} models relations as translation operations, while DistMult \cite{yang2014embedding} and ComplEx \cite{trouillon2016complex} apply tensor factorization, the latter extending to complex-valued embeddings.
+Early KGC research centered on triple-based models using embedding methods to represent entities and relations in a continuous vector space.
+TransE~\cite{bordes2013translating} models relations as translation operations, while DistMult~\cite{yang2014embedding} and ComplEx~\cite{trouillon2016complex} apply tensor factorization, the latter extending to complex-valued embeddings.
 
-Advancements introduced Graph Neural Networks (GNNs) \cite{schlichtkrull2018modeling} to refine entity representations by aggregating structural information. However, these models struggle with long-tail entities due to sparse connectivity, limiting predictive performance.
+%Advancements introduced Graph Neural Networks (GNNs)~\cite{schlichtkrull2018modeling} to refine entity representations by aggregating structural information.
+%However, these models struggle with long-tail entities due to sparse connectivity, limiting predictive performance.
 
-To overcome these limitations, text-based KGC leverages pre-trained language models (PLMs) to incorporate entity and relation descriptions. KG-BERT \cite{yao2019kgbert} reframes KGC as a classification problem, encoding triples as text for distinguishing valid from invalid ones. Despite effectiveness, these methods require extensive fine-tuning and high computational costs, restricting scalability.
+%To overcome these limitations, text-based KGC leverages pre-trained language models (PLMs) to incorporate entity and relation descriptions. KG-BERT~\cite{yao2019kgbert} reframes KGC as a classification problem, encoding triples as text for distinguishing valid from invalid ones.
+%Despite effectiveness, these methods require extensive fine-tuning and high computational costs, restricting scalability.
 
-Large language models (LLMs) have revolutionized KGC via in-context learning (ICL) and instruction tuning, enabling link prediction without explicit retraining. Unlike fixed-structure KG models, LLMs leverage broad internal knowledge for zero-shot and few-shot predictions. However, they face challenges like hallucination (factually incorrect outputs) and structural misalignment with KG schemas.
+Large Language Models (LLMs) have revolutionized KGC by leveraging their broad internal knowledge and advanced reasoning capabilities.
+This enables, in some cases, the ability to perform link prediction without even being trained on the target data, using techniques such as in-context learning and instruction tuning.
+Unlike traditional knowledge graph (KG) models, which rely on structured embeddings, LLMs offer greater flexibility for zero-shot and few-shot predictions.
+However, they often struggle with hallucination and structural misalignment with KG schemas.
 
-Two main strategies integrate LLMs into KGC: \textbf{Purely Prompt-Based Methods}, which leverage structured retrieval and in-context learning without modifying model parameters, and \textbf{Fine-Tuning-Based Methods}, which embed structured knowledge into the model through additional training. The former is efficient and adaptable but depends on well-designed retrieval mechanisms, while the latter enhances domain-specific reasoning at the cost of increased computational demands and dataset dependency.
 
-Among purely prompt-based approaches, KICGPT \cite{wei2023kicgpt} exemplifies a retriever-integrated prompting strategy, where a traditional triple-based KGC model retrieves a ranked list of candidate entities, which is then refined by an LLM through Knowledge Prompts—an in-context learning technique encoding KG structure into prompts. Similarly, MPIKGC \cite{xu2024mpikgc} enhances description-based KGC models by querying LLMs to expand entity descriptions, improve relation understanding, and extract structural information, without modifying the LLM's parameters. These methods demonstrate that effective KGC can be achieved without fine-tuning, reducing computational costs while leveraging structured retrieval mechanisms.
+We divide LLM-based KGC solutions into two main categories:
 
-Conversely, fine-tuning-based approaches modify LLM parameters to embed structured KG knowledge directly. KoPA \cite{qin2023kopa} introduces a Knowledge Prefix Adapter, mapping KG structural embeddings into the LLM's textual space via an adapter network, allowing structure-aware guidance during inference. DIFT \cite{liu2024dift} fine-tunes LLMs with discrimination instructions, refining the model's ability to select correct KG entities while mitigating grounding errors. KC-GenRe \cite{wang2024kcgenre} proposes a knowledge-constrained generative re-ranking method, leveraging LLM fine-tuning to improve entity ranking through structured guidance. Additionally, RPKGC \cite{khalil2024rpkgc} fine-tunes an LLM for relation prediction, training the model to infer plausible relations between entity pairs. These methods enhance reasoning capabilities at the expense of increased training complexity and resource requirements.
+\textbf{Purely Prompt-Based Methods} exploit structured retrieval or textual descriptions alongside in-context learning, without modifying LLM parameters.
+For instance, MPIKGC~\cite{xu2024mpikgc} enhances description-based KGC models by querying LLMs to expand entity representations, thereby improving relation understanding and capturing structural clues.
+\todo{One paper here would be pretty good}
+Finally, KICGPT~\cite{wei2023kicgpt} stands out by incorporating a triple-based retriever for preliminary ranking, then refining the candidate list through \emph{Knowledge Prompts} that encode KG structure directly into the LLM’s prompts.
+Although KICGPT’s approach remains parameter-free, it injects structural awareness more explicitly than simpler prompt-based methods.
 
-Given their distinct yet complementary methodologies, the remaining sections of this report will focus on KICGPT and KoPA, providing a detailed examination of their underlying principles, implementation details, and comparative advantages in leveraging LLMs for KGC.
+\textbf{Fine-Tuning-Based Methods} embed KG structure into the LLM through additional training.
+For example, DIFT~\cite{liu2024dift} refines the model with discrimination instructions to better identify valid entities, while KC-GenRe~\cite{wang2024kcgenre} adopts a knowledge-constrained re-ranking technique, updating LLM weights to emphasize entity ranking.
+%RPKGC~\cite{khalil2024rpkgc} fine-tunes a model for relation prediction, learning to infer plausible connections between entity pairs.
+Finally, KoPA~\cite{qin2023kopa} integrates a \emph{Knowledge Prefix Adapter}, mapping KG embeddings into the LLM’s textual space to guide inference with structural signals.
+Although KoPA modifies model weights, it keeps the KG structure directly accessible during generation and prediction.
+
+
 
 % ---------------------------------------------------------
 %
