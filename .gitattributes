@@ -1,2 +1,2 @@
 * text=auto
-Project/Final/Main/KGT5/kgt5_finetuned/model.safetensors filter=lfs diff=lfs merge=lfs -text
+
