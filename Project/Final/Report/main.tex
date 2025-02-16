@@ -434,9 +434,7 @@ descriptions, and improve predictions.
         \end{tikzpicture}
     }
 
-    \caption{Fine-tuning of \modelalpaca and \modeldeepseek.
-        Show are loss and gradient norm trends separately for each model, and both losses together.
-        Figure and results from us.}
+    \caption{Fine-tuning of \modelalpaca and \modeldeepseek. Loss and gradient norm trends are shown separately for each model, along with a comparison of both losses. Figure and results from our work.}
     \label{fig:training_comparison}
 \end{figure}
 
@@ -579,7 +577,13 @@ So we would expect them to perform similarly.
     - Mention any error analysis or interesting observations.
 }
 
-The performance disparity between DeepSeek, Mistral, and ChatGPT in link prediction can be attributed to fundamental differences in inference strategies, decoding mechanisms, and retrieval generalization. A key issue with DeepSeek's approach is its excessive reasoning verbosity, where it attempts to construct an elaborate thought process before finalizing its output. This overthinking leads to self-trimming, where it removes redundant or lower-confidence content using `...`, potentially accidentally discarding the correct ground truth entity. This behavior suggests that DeepSeek's decoding strategy—likely influenced by length penalties prioritizes generating concise final outputs at the cost of completeness. As a result, its final predictions may be truncated or ambiguous, reducing MRR and Hits@1 scores. Additionally, DeepSeek tends to overgeneralize, listing broad categorical entities rather than precisely ranking the most relevant ones, likely due to weaker entity disambiguation mechanisms or inadequate prompt conditioning compared to ChatGPT. Mistral, while outperforming DeepSeek, still lacks ChatGPT's reinforcement-based reranking strategies, resulting in less consistent top-ranked entity predictions. In contrast, ChatGPT achieves superior performance by leveraging reinforcement learning from human feedback (RLHF) and optimized retrieval heuristics, ensuring a balance between contextual reasoning and concise, high-confidence predictions.
+The link prediction performance of \modeldeepseek, \modelministral, and ChatGPT varies due to differences in inference behavior, decoding strategies, and instruction adherence.
+
+\modeldeepseek struggled to follow formatting constraints despite explicit prompts. It often produced verbose reasoning before generating answers and self-trimmed responses, sometimes omitting correct entities. This suggests a pretraining bias favoring exhaustive analysis, which conflicted with structured output requirements. Its decoding strategy prioritized information compression, reducing MRR and Hits@1 scores. The few-shot prompting setup may have worsened its tendency to "overthink," making precise, structured outputs harder to achieve.
+
+\modelministral performed better at instruction adherence and structured output than \modeldeepseek. It balanced reasoning depth with clarity but lacked ChatGPT's reranking optimizations, leading to lower MRR and weaker top-ranked predictions. While it ranked entities more consistently, its Hits@10 score lagged slightly, indicating fewer retrieved correct entities overall. Nonetheless, its superior instruction-following made it more effective than \modeldeepseek for structured tasks.
+
+ChatGPT outperformed both models, excelling in instruction adherence and ranking precision due to RLHF and advanced reranking heuristics. It avoided \modeldeepseek's verbosity and \modelministral's retrieval inefficiencies, yielding higher MRR, Hits@1, and Hits@3 scores. Its ability to dynamically contextualize information in few-shot settings further improved entity predictions, making it the most effective model for knowledge graph completion.
 
 % ---------------------------------------------------------
 %
