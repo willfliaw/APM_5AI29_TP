@@ -151,25 +151,24 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 %
 % ---------------------------------------------------------
 
+\section{Problem Statement}\label{sec:problem-statement}
 
-\section{Problem Statement}\label{sec:problem_statement}
-\todo{Define precisely what we are doing (predicting head/tail or just the relation?). Maybe Include a small example to illustrate the problem? Should not be necessary}
-\todo{Be mathematically rigierous}
+Knowledge Graph Completion (KGC) aims to infer missing facts in a knowledge graph (KG) by leveraging existing structural and semantic relationships.
+A KG consists of entities, relations, and triples of the form \( (h, r, t) \), where \( h \) (head) and \( t \) (tail) are connected by relation \( r \).
+Due to the inherent incompleteness of KGs, KGC seeks to either predict missing entities or verify candidate triples.
 
-% Knowledge Graph Completion (KGC) is a fundamental task in artificial intelligence aimed at addressing the inherent incompleteness of knowledge graphs (KGs). KGs represent real-world facts as structured triples of the form $(h, r, t)$, where $h$ (head entity) and $t$ (tail entity) are connected by a relation $r$. Despite their widespread use in search engines, recommendation systems, and question-answering applications, KGs suffer from missing information, necessitating the development of KGC techniques to predict missing elements and improve KG utility.
-
-
-\section{Problem Statement}\label{sec:problem}
-
-Knowledge graph completion (KGC) aims to infer missing facts in a knowledge graph (KG) by leveraging existing structural and semantic relationships. Given a KG defined as \( G = (E, R, T) \), where \( E \) is the set of entities, \( R \) is the set of relations, and \( T \subseteq E \times R \times E \) represents the set of triples, KGC encompasses two fundamental tasks: \emph{link prediction} and \emph{triple classification}.
+While KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
+In this work, we consider two complementary tasks: \emph{link prediction} and \emph{triple classification}.
+This distinction arises from the differing nature of the evaluated approaches.
+While they could be adapted to a unified setting, doing so would require substantial modifications that could alter their original design.
 
 \paragraph{Link Prediction}
-The goal of link prediction is to predict a missing entity in an incomplete triple. Formally, given an incomplete triple \( (h, r, ?) \) or \( (?, r, t) \), where \( h, t \in E \) and \( r \in R \), the objective is to rank candidate entities from \( E \) to fill the missing slot. The ranking is determined based on a scoring function \( f(h, r, t) \), which estimates the likelihood of a triple being valid.
+Link prediction involves inferring a missing entity in an incomplete triple. Given \( (h, r, ?) \) or \( (?, r, t) \), the goal is to rank candidate entities based on their plausibility as a valid completion.
 
 \paragraph{Triple Classification}
-Triple classification is the task of determining whether a given candidate triple \( (h, r, t) \) is valid. Instead of ranking entities, the model assigns a binary label \( y \in \{0,1\} \), where \( y = 1 \) indicates that the triple is plausible, and \( y = 0 \) suggests that it is not. The classification decision is based on the function \( g(h, r, t) \), which evaluates the coherence of the relationship between \( h \) and \( t \) given \( r \).
+Triple classification assesses whether a given triple \( (h, r, t) \) is valid. Instead of ranking candidates, the model outputs a binary decision indicating whether the relationship holds.
 
-The methods we employ, KICGPT and KoPA, each tackle a different aspect of KGC. KICGPT addresses link prediction using prompt-based ranking, while KoPA formulates triple classification by integrating structural KG embeddings into the LLM’s reasoning process.
+By considering both tasks, we evaluate KGC models from two perspectives: predictive ranking and explicit fact verification.
 
 
 % ---------------------------------------------------------
