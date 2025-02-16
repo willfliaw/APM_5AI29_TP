@@ -184,13 +184,13 @@ We divide LLM-based KGC solutions into two main categories:
 \textbf{Purely Prompt-Based Methods} exploit structured retrieval or textual descriptions alongside in-context learning, without modifying LLM parameters.
 For instance, MPIKGC~\cite{xu2024mpikgc} enhances description-based KGC models by querying LLMs to expand entity representations, thereby improving relation understanding and capturing structural clues.
 \todo{One paper here would be pretty good}
-Finally, KICGPT~\cite{wei2023kicgpt} stands out by incorporating a triple-based retriever for preliminary ranking, then refining the candidate list through \emph{Knowledge Prompts} that encode KG structure directly into the LLM’s prompts.
-Although KICGPT’s approach remains parameter-free, it injects structural awareness more explicitly than simpler prompt-based methods.
+Finally, KICGPT~\cite{wei2023kicgpt} stands out by incorporating a triple-based retriever for preliminary ranking, then refining the candidate list through \emph{Knowledge Prompts} that encode KG structure directly into the LLM's prompts.
+Although KICGPT's approach remains parameter-free, it injects structural awareness more explicitly than simpler prompt-based methods.
 
 \textbf{Fine-Tuning-Based Methods} embed KG structure into the LLM through additional training.
 For example, DIFT~\cite{liu2024dift} refines the model with discrimination instructions to better identify valid entities, while KC-GenRe~\cite{wang2024kcgenre} adopts a knowledge-constrained re-ranking technique, updating LLM weights to emphasize entity ranking.
 %RPKGC~\cite{khalil2024rpkgc} fine-tunes a model for relation prediction, learning to infer plausible connections between entity pairs.
-Finally, KoPA~\cite{qin2023kopa} integrates a \emph{Knowledge Prefix Adapter}, mapping KG embeddings into the LLM’s textual space to guide inference with structural signals.
+Finally, KoPA~\cite{qin2023kopa} integrates a \emph{Knowledge Prefix Adapter}, mapping KG embeddings into the LLM's textual space to guide inference with structural signals.
 Although KoPA modifies model weights, it keeps the KG structure directly accessible during generation and prediction.
 
 
@@ -241,6 +241,8 @@ KICGPT \cite{wei2023kicgpt} and KoPA \cite{qin2023kopa} with modification on the
 
 \subsection{KICGPT}
 \label{sec:method:kicgpt}
+
+\todo{further explain KGC Retriever}
 
 % \subsection{Architecture}
 % \label{sec:method:architecture}
@@ -497,10 +499,33 @@ descriptions, and improve predictions.
 \todo{Maybe shortly explain dataset?}
 \todo{maybe QUICKLY intro metrics, however should be known already}
 
+\subsection{Datasets}
+
+For our experiments, we employed two widely used benchmarks for KGC, with their statistics provided in \cref{tab:datasets}.
+
+\textbf{WN18RR} is a refined version of the WN18 dataset \cite{wn18rr}, derived from WordNet \cite{wordnet}. It was introduced to address data leakage issues in WN18 by removing inverse relations that made link prediction tasks trivial. Due to the removal of these redundant relations, WN18RR presents a more challenging benchmark for knowledge graph completion, requiring models to generalize beyond simple pattern memorization.
+
+\textbf{CoDeX-S} (Complex Dataset Extracted from Wikidata \cite{wikidata}) is a subset of the CoDeX dataset \cite{codex}, designed to provide a more realistic and diverse set of relational facts. Unlike WN18RR, which is based on lexical semantics, CoDeX-S originates from Wikidata, leading to a rich and varied relational structure. Additionally, CoDeX-S has been curated to ensure a balanced distribution of relations, reducing the potential for biases found in many other knowledge graph datasets.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l c c c c c}
+        \hline
+        \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} & \textbf{\# train} & \textbf{\# valid} & \textbf{\# test} \\
+        \hline
+        WN18RR           & 40,943          & 11              & 86,835            & 3,034             & 3,134            \\
+        CoDeX-S          & 2,034           & 42              & 32,888            & 3,654             & 3,654            \\
+        \hline
+    \end{tabular}
+    \caption{Statistics of the datasets used in our experiments.}
+    \label{tab:datasets}
+\end{table}
+
+
 \subsection{Concise Model Summaries}
 
 We use three models for our experiments:
-Alpaca-7B~\cite{taori2023stanford} is a fine-tuned LLaMA 7B model designed for instruction-following tasks, trained on 52,000 examples generated via OpenAI’s text-davinci-003.
+Alpaca-7B~\cite{taori2023stanford} is a fine-tuned LLaMA 7B model designed for instruction-following tasks, trained on 52,000 examples generated via OpenAI's text-davinci-003.
 Ministral-8B-Instruct-2410~\cite{mistralai2024ministral8b} is an 8-billion-parameter model fine-tuned for instruction tasks, featuring a 128k context window and multilingual support, outperforming similar-sized models.
 Compared to Alpaca, Ministral-8B benefits from a larger model size, an extended context window, and broader multilingual capabilities.
 DeepSeek-R1-Distill-Llama-8B~\cite{deepseekai2025deepseekr1distillllama8b} is an 8-billion-parameter model distilled from DeepSeek-R1~\cite{guo2025deepseek}, focusing on reasoning and problem-solving, particularly excelling in math and code tasks.
@@ -514,7 +539,7 @@ All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU
 \todo{very unhappy with this, need to write somethign like this}
 Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \modelalpaca on the CoDeX~\cite{safavi2020codex} dataset.
 This process took 10 hours and 12 minutes, with the model converging as expected.
-The training loss, shown in the leftmost plot of \cref{fig:training_comparison}, follows a bit noisy downward trend, while the gradient norm exhibits significant fluctuations but also trends downards over time.
+The training loss, shown in the leftmost plot of \cref{fig:training_comparison}, follows a bit noisy downward trend, while the gradient norm exhibits significant fluctuations but also trends downwards over time.
 
 Similarly, \modeldeepseek was fine-tuned under the same setup, with its training loss shown in the middle plot of \cref{fig:training_comparison}.
 9h and 56 minutes.
