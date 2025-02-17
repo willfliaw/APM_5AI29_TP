@@ -601,6 +601,12 @@ Allowing it to reason could potentially improve performance, but this would requ
 \todo{TBD otherwise leave out}
 \todo{Summarize the key findings and how they link back to your problem statement. Suggest improvements or next steps (e.g., new dataset, advanced fusion technique, or GNN-based approach). Highlight what you learned and what remains challenging.}
 
+In summary, we examined two complementary approaches for Knowledge Graph Completion—KICGPT, a purely prompt-based tail prediction method, and KoPA, a fine-tuning-based triple classification approach. KICGPT leverages in-context learning via structured prompts and a lightweight retriever, offering a ``parameter-free'' alternative that can be applied directly to various Large Language Models. KoPA, by contrast, integrates structural embeddings into the LLM's training through a Knowledge Prefix Adapter, enabling more targeted triple classification by unifying textual and relational cues.
+
+Our empirical results highlight that while prompt-based methods like KICGPT benefit from flexibility and reduced computational demands, performance and output consistency can vary widely depending on the chosen LLM's internal knowledge and adherence to prompt instructions. Fine-tuning-based methods such as KoPA can be more stable, though they often incur longer training times and may require careful balancing between textual generation and structural consistency to avoid overconfident predictions.
+
+Overall, these findings suggest that the optimal approach to Knowledge Graph Completion hinges on task requirements and resource constraints: KICGPT excels when minimal overhead and rapid deployment are priorities, whereas KoPA offers more robust control over the classification process at the cost of additional training. Future research may focus on hybrid strategies that jointly leverage the prompt-driven adaptability of KICGPT and the structural grounding of KoPA. Such endeavors could address current limitations—such as handling large, incomplete, and evolving knowledge graphs in a more controlled and scalable manner—while further improving link prediction and triple classification performance.
+
 \bibliography{main}
 
 \end{document}
