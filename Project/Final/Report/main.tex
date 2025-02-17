@@ -151,7 +151,8 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 
 \section{Abstract}
 
-This work explores Knowledge Graph Completion (KGC) using two distinct approaches: \textbf{prompt-based tail entity ranking} and \textbf{fine-tuning-based triple classification}. By leveraging structured retrieval for ranking candidates and integrating knowledge-infused prompts for classification, we assess the effectiveness of different large language models across various KGC tasks.
+This work explores Knowledge Graph Completion (KGC) using two similar approaches: prompt-based tail entity ranking and fine-tuning-based triple classification.
+By leveraging structured retrieval for ranking candidates and integrating knowledge-infused prompts for classification, we assess the effectiveness of different large language models across various KGC tasks.
 
 % ---------------------------------------------------------
 %
@@ -161,24 +162,26 @@ This work explores Knowledge Graph Completion (KGC) using two distinct approache
 
 \section{Problem Statement}\label{sec:problem-statement}
 
-Knowledge Graph Completion (KGC) aims to infer missing facts in a knowledge graph (KG) by leveraging existing structural and semantic relationships.
-A KG consists of entities, relations, and triples of the form \( (h, r, t) \), where \( h \) (head) and \( t \) (tail) are connected by relation \( r \).
+Knowledge Graph Completion aims to infer missing facts in a knowledge graph (KG) by leveraging existing structural and semantic relationships.
+A knowledge graph consists of entities, relations, and triples of the form \( (h, r, t) \), where \( h \) (head) and \( t \) (tail) are connected by relation \( r \).
 Due to the inherent incompleteness of KGs, KGC seeks to either predict missing entities or verify candidate triples.
 
 Although KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
 In this work, we consider two complementary tasks: \emph{link prediction} and \emph{triple classification}.
 This distinction arises from the differing nature of the evaluated approaches.
-While they could be adapted to a unified setting, doing so would require substantial modifications that could alter their original design.
+While they could be adapted to a unified setting, doing so would require substantial modifications that could alter their original design, and we therefore refrained from doining so at the cost of having two slightly different problem formulations.
 
-\paragraph{Link Prediction}
+Although KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
+In this work, we focus on two complementary tasks: \emph{link prediction} and \emph{triple classification}.
+This distinction reflects the differences in the evaluated approaches.
+While it is certainly possible to adapt both approaches to a unified setting, doing so would require significant modifications that could change their original design.
+To preserve the intended methodology from the papers, we therefore opted to maintain these two slightly different problem formulations.
+
+\paragraph{Link Prediction:}
 Link prediction involves inferring a missing entity in an incomplete triple. Given \( (h, r, ?) \) or \( (?, r, t) \), the goal is to rank candidate entities based on their plausibility as a valid completion.
 
-\paragraph{Triple Classification}
+\paragraph{Triple Classification:}
 Triple classification assesses whether a given triple \( (h, r, t) \) is valid. Instead of ranking candidates, the model outputs a binary decision indicating whether the relationship holds.
-\\
-
-By considering both tasks, we evaluate KGC models from two perspectives: predictive ranking and explicit fact verification.
-
 
 % ---------------------------------------------------------
 %
@@ -200,19 +203,18 @@ TransE~\cite{bordes2013translating} models relations as translation operations, 
 
 Large Language Models (LLMs) have revolutionized KGC by leveraging their broad internal knowledge and advanced reasoning capabilities.
 This enables, in some cases, the ability to perform link prediction without even being trained on the target data, using techniques such as in-context learning and instruction tuning.
-Unlike traditional knowledge graph (KG) models, which rely on structured embeddings, LLMs offer greater flexibility for zero-shot and few-shot predictions.
+Unlike traditional KG models, which rely on structured embeddings, LLMs offer greater flexibility for zero-shot and few-shot predictions.
 However, they often struggle with hallucination and structural misalignment with KG schemas.
 
 
 We divide LLM-based KGC solutions into two main categories:
 
-\paragraph{Purely Prompt-Based Methods} exploit structured retrieval or textual descriptions alongside in-context learning, without modifying LLM parameters.
+\paragraph{Purely Prompt-Based Methods:} These exploit structured retrieval or textual descriptions alongside in-context learning, without modifying LLM parameters.
 For instance, MPIKGC~\cite{xu2024mpikgc} enhances description-based KGC models by querying LLMs to expand entity representations, thereby improving relation understanding and capturing structural clues.
-\todo{One paper here would be pretty good}
-Finally, KICGPT~\cite{wei2023kicgpt} stands out by incorporating a triple-based retriever for preliminary ranking, then refining the candidate list through \emph{Knowledge Prompts} that encode KG structure directly into the LLM's prompts.
+KICGPT~\cite{wei2023kicgpt} stands out by incorporating a triple-based retriever for preliminary ranking, then refining the candidate list through \emph{Knowledge Prompts} that encode KG structure directly into the LLM's prompts.
 Although KICGPT's approach remains parameter-free, it injects structural awareness more explicitly than simpler prompt-based methods.
 
-\paragraph{Fine-Tuning-Based Methods} embed KG structure into the LLM through additional training.
+\paragraph{Fine-Tuning-Based Methods:} These methods embed KG structure into the LLM through additional training.
 For example, DIFT~\cite{liu2024dift} refines the model with discrimination instructions to better identify valid entities, while KC-GenRe~\cite{wang2024kcgenre} adopts a knowledge-constrained re-ranking technique, updating LLM weights to emphasize entity ranking.
 %RPKGC~\cite{khalil2024rpkgc} fine-tunes a model for relation prediction, learning to infer plausible connections between entity pairs.
 Finally, KoPA~\cite{qin2023kopa} integrates a \emph{Knowledge Prefix Adapter}, mapping KG embeddings into the LLM's textual space to guide inference with structural signals.
@@ -228,28 +230,21 @@ Although KoPA modifies model weights, it keeps the KG structure directly accessi
 
 \section{Methodology}\label{sec:methodology}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/KICGPTarchitecture}
-    \caption{KICGPT architecture, consisting of a triple-based KGC retriever, the Knowledge Prompt, and an LLM-based reranker.}
-    \label{fig:KICGPTarchitecture}
-\end{figure}
+Following the analysis in \cref{sec:background}, we now outline our methodological approach to KGC. Our work examines one representative method from each of the previously discussed categories: KICGPT, a purely prompt-based approach for tail prediction, and KoPA, which applies fine-tuning for triple classification.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/KoPAarchitecture}
-    \caption{KoPA architecture, illustrating the integration of structural embeddings with an LLM via the Knowledge Prefix Adapter.}
-    \label{fig:KoPAarchitecture}
-\end{figure}
-
-Following the discussion in \cref{sec:background}, we now outline our methodological approach to KGC.
-Our work explores two complementary strategies: prompt-based tail prediction with KICGPT and fine-tuning-based triple classification with KoPA.
-While these approaches address different formulations of KGC, they both rely on the LLM’s ability to assess entity relationships and infer missing knowledge.
 
 \subsection{KICGPT: Prompt-Based Link Prediction}
 \label{sec:method:kicgpt}
 
-KICGPT primarily consists of three components, as illustrated in \cref{fig:KICGPTarchitecture}: a triple-based KGC retriever, a Knowledge Prompt module, and an LLM-based reranker. Given a query triple \( (h, r, ?) \) from a KG \(G\) consisting of set of entities \(E\) and relations \(R\), the retriever computes a ranking over all possible entities \( e \in E \), generating an initial ordered list \( R_{\text{retriever}} = [e_1, e_2, ..., e_{|E|}] \) based on a predefined scoring function. The Knowledge Prompt then provides structured in-context learning examples to guide the LLM, which subsequently refines the top-\( m \) candidates, producing a reranked list \( R_{\text{LLM}} = [e'_1, e'_2, ..., e'_m] \).
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/KICGPTarchitecture}
+    \caption{KICGPT architecture, consisting of a triple-based KGC retriever, the \emph{Knowledge Prompt}, and an LLM-based reranker.}
+    \label{fig:KICGPTarchitecture}
+\end{figure}
+
+KICGPT primarily consists of three components, as illustrated in \cref{fig:KICGPTarchitecture}: a triple-based KGC retriever, a \emph{Knowledge Prompt} module, and an LLM-based reranker.
+Given a query triple \( (h, r, ?) \) from a KG \(G\) consisting of set of entities \(E\) and relations \(R\), the retriever computes a ranking over all possible entities \( e \in E \), generating an initial ordered list \( R_{\text{retriever}} = [e_1, e_2, ..., e_{|E|}] \) based on a predefined scoring function. The \emph{Knowledge Prompt} then provides structured in-context learning examples to guide the LLM, which subsequently refines the top-\( m \) candidates, producing a reranked list \( R_{\text{LLM}} = [e'_1, e'_2, ..., e'_m] \).
 The final output of KICGPT combines the LLM’s refined ranking with the remaining entities from the retriever, yielding the final entity ranking:
 
 \[
@@ -258,7 +253,9 @@ The final output of KICGPT combines the LLM’s refined ranking with the remaini
 
 \subsubsection{Knowledge Prompt Construction}
 
-The Knowledge Prompt enables KICGPT to leverage in-context learning by integrating relevant KG information into the LLM’s input. The prompt is constructed from two pools of triples: the analogy pool \( D_a \) and the supplement pool \( D_s \). The analogy pool consists of triples that share the same relation \( r \) as the query, ensuring that the LLM is exposed to examples with similar relational structures:
+The \emph{Knowledge Prompt} enables KICGPT to leverage in-context learning by integrating relevant KG information into the LLM’s input.
+The prompt is constructed from two pools of triples: the analogy pool \( D_a \) and the supplement pool \( D_s \).
+The analogy pool consists of triples that share the same relation \( r \) as the query, ensuring that the LLM is exposed to examples with similar relational structures:
 
 \[
     D_a = \{(e', r, e'') \in G \mid e', e'' \in E\}.
@@ -276,7 +273,8 @@ For the analogy pool, entity counters are initialized at zero, and triples are i
 
 \subsubsection{Prompt Engineering and Query Processing}
 
-To effectively incorporate the selected examples, KICGPT transforms structured triples into natural language statements using a unified prompt template. This ensures consistent formatting across queries and demonstrations, making the input more interpretable for the LLM. The prompt follows a structured process consisting of the following phases:
+To effectively incorporate the selected examples, KICGPT transforms structured triples into natural language statements using a unified prompt template.
+This ensures consistent formatting across queries and demonstrations, making the input more interpretable for the LLM. The prompt follows a structured process consisting of the following phases:
 
 \begin{itemize}
     \item \textbf{Task Description:} The prompt begins with a responsibility statement that explicitly clarifies the LLM’s role in ranking candidate entities based on relational context.
@@ -286,16 +284,21 @@ To effectively incorporate the selected examples, KICGPT transforms structured t
     \item \textbf{Re-Ranking and Final Prediction:} The LLM processes the structured prompt and re-ranks the top-\( m \) candidates, producing an ordered list \( R_{\text{LLM}} \). The highest-ranked entities from this list replace the corresponding top-\( m \) results from the retriever, yielding the final ranking.
 \end{itemize}
 
-By combining retrieval-based entity ranking with structured in-context learning, KICGPT effectively integrates KG structure into the LLM’s reasoning process without requiring parameter updates. This hybrid approach allows for both flexibility and improved prediction accuracy, making it a powerful tool for link prediction in knowledge graphs.
 
 \subsection{KoPA: Fine-Tuning-Based Triple Classification}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/KoPAarchitecture}
+    \caption{KoPA architecture, illustrating the integration of structural embeddings with an LLM via the Knowledge Prefix Adapter.}
+    \label{fig:KoPAarchitecture}
+\end{figure}
 
 KoPA addresses the triple classification problem by embedding structured knowledge graph representations into the LLM’s reasoning process, explicitly incorporating KG structure through fine-tuning rather than relying on prompt-based ranking.
 By leveraging structured KG embeddings, KoPA enhances the LLM’s ability to distinguish between valid and invalid triples, integrating relational constraints directly into its decision-making process.
 As illustrated in \cref{fig:KoPAarchitecture}, the model combines structural embeddings with a knowledge prefix adapter, enabling a seamless fusion of KG-based constraints with LLM inference.
 
 \subsubsection{Structural Embeddings}
-\todo{didnt we already define e and r?}
 To integrate KG structure, each entity \( e \) and relation \( r \) is mapped into a latent vector space, where relational dependencies are preserved. The learned embeddings, denoted as \( \mathbf{e} \in \mathbb{R}^{d_e} \) for entities and \( \mathbf{r} \in \mathbb{R}^{d_r} \) for relations, capture topological and semantic information from the KG. A scoring function \( F(h, r, t) = \mathbf{h}^\top \mathbf{W_r} \mathbf{t} \), where \( \mathbf{h}, \mathbf{t} \) are entity embeddings and \( \mathbf{W_r} \) is a relation-specific transformation matrix, is used to estimate the plausibility of a triple.
 
 These embeddings are pre-trained using self-supervised learning, ensuring that relational constraints are reflected in the representation space.
@@ -311,7 +314,6 @@ This approach ensures that the model retains relational constraints while mainta
 Unlike fully fine-tuned KG embeddings, which modify the LLM’s internal parameters, the prefix adapter enables lightweight structural integration without overfitting to specific KG schemas.
 
 \subsubsection{Fine-Tuning and Classification}
-% \todo{g(h, r, t) does not exist, validity of paragraph?}
 % KoPA is trained on a dataset of valid and invalid triples to optimize its ability to distinguish factual from incorrect knowledge.
 % Given an input triple \( (h, r, t) \), the model computes a classification score \( g(h, r, t) \), indicating the likelihood that the triple is valid.
 % The knowledge prefix adapter ensures that the LLM considers both explicit KG structure and learned textual reasoning when making classification decisions.
@@ -320,8 +322,6 @@ Unlike fully fine-tuned KG embeddings, which modify the LLM’s internal paramet
 The knowledge prefix and the textual input are jointly processed by the LLM,
 which predicts the validity of the input triple based on the combined information.
 The LLM is fine-tuned on the instruction-following task to optimize its triple classification accuracy.
-KoPA's evaluation focuses on its ability to correctly classify valid and invalid triples as a binary classification task.
-The performance assessment uses standard metrics including accuracy, precision, recall, and F1-score.
 % ---------------------------------------------------------
 %
 % EXPERIMENTS
@@ -440,7 +440,7 @@ The performance assessment uses standard metrics including accuracy, precision, 
                         at={(0.5,-0.15)},
                         anchor=north,
                         /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3,
+                        legend columns=4,
                         draw=none, % Remove box
                         fill=none,
                         font=\small
@@ -450,10 +450,14 @@ The performance assessment uses standard metrics including accuracy, precision, 
             % Bars
             \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
             \addlegendentry{KICGPT}
-            \addplot[fill=blue]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
+            \addplot[fill=teal]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
             \addlegendentry{\modelministral}
             \addplot[fill=purple] coordinates {(MRR,0.2700) (Hits@1,0.1233) (Hits@3,0.2994) (Hits@10,0.6145)};
             \addlegendentry{\modeldeepseek}
+
+            \addplot[fill=violet] coordinates {(MRR,0.2461) (Hits@1,0.0980) (Hits@3,0.2580) (Hits@10,0.6120)};
+            \addlegendentry{\modeldeepseek Zeroshot}
+
 
         \end{axis}
     \end{tikzpicture}
@@ -462,11 +466,9 @@ The performance assessment uses standard metrics including accuracy, precision, 
 \end{figure}
 
 
-\todo{maybe QUICKLY intro metrics, however should be known already}
-
 \subsection{Datasets}
 
-For our experiments, we used two widely adopted KGC benchmarks, summarized in \cref{tab:datasets}.
+For our experiments, we used two widely adopted KGC benchmarks, which are summarized in \cref{tab:datasets}.
 
 \paragraph{WN18RR} is a filtered version of WN18~\cite{wn18rr}, derived from WordNet~\cite{wordnet}, designed to eliminate inverse relations that previously made link prediction trivial.
 This refinement increases task difficulty, requiring models to generalize beyond simple pattern recognition.
@@ -474,15 +476,14 @@ This refinement increases task difficulty, requiring models to generalize beyond
 \paragraph{CoDeX-S} (Complex Dataset Extracted from Wikidata~\cite{wikidata}) is a subset of CoDeX~\cite{safavi2020codex}, offering a diverse set of relational facts.
 Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikidata, ensuring a richer relational structure with a more balanced distribution of relations.
 
-\todo{fix labels, make them mathetmatical}
-\begin{table}[h]
+\begin{table}
     \centering
     \begin{tabular}{l c c c c c}
         \hline
-        \textbf{Dataset} & \textbf{\# Entities} & \textbf{\# Relations} & \textbf{\# Train} & \textbf{\# Valid} & \textbf{\# Test} \\
+        Dataset & \#Entities & \#Relations & \#Train & \#Test \\
         \hline
-        WN18RR           & 40,943               & 11                    & 86,835            & 3,034             & 3,134            \\
-        CoDeX-S          & 2,034                & 42                    & 32,888            & 3,654             & 3,654            \\
+        WN18RR & 40,943 & 11 & 86,835 & 3,134 \\
+        CoDeX-S & 2,034 & 42 & 32,888 & 3,654 \\
         \hline
     \end{tabular}
     \caption{Statistics of the datasets used in our experiments.}
@@ -491,7 +492,7 @@ Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikid
 
 \subsection{Language Models}
 
-To evaluate model performance across different architectures, we consider three language models with distinct capabilities.
+To evaluate model performance across different architectures, we consider three language models with distinct capabilities:
 
 \paragraph{Alpaca-7B}~\cite{taori2023stanford} is a fine-tuned variant of LLaMA 7B, trained on 52,000 instruction-response pairs generated by OpenAI’s text-davinci-003.
 Optimized for general instruction-following, it serves as a lightweight baseline.
@@ -588,23 +589,6 @@ Allowing it to reason could potentially improve performance, but this would requ
     \caption{CoDeX Performance Evaluation Metrics}
     \label{fig:codex_evaluation}
 \end{figure}
-
-% ---------------------------------------------------------
-%
-% DISCUSSION
-%
-% ---------------------------------------------------------
-
-
-\section{Discussion}\label{sec:discussion}
-\todo{TBD, only do if there is actual deeper meaning otherwise fuse with experiments}
-
-\todo{Interpret the results in a deeper way:
-    - Why did certain methods do better?
-    - Mention any error analysis or interesting observations.
-}
-
-
 
 % ---------------------------------------------------------
 %
