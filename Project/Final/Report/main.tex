@@ -249,7 +249,7 @@ While these approaches address different formulations of KGC, they both rely on 
 \subsection{KICGPT: Prompt-Based Link Prediction}
 \label{sec:method:kicgpt}
 
-KICGPT primarily consists of three components, as illustrated in \cref{fig:KICGPTarchitecture}: a triple-based KGC retriever, a Knowledge Prompt module, and an LLM-based reranker. Given a query triple \( (h, r, ?) \) from a KG \(G\) consisting of set of entites \(E\) and set of relationships \(R\), the retriever computes a ranking over all possible entities \( e \in E \), generating an initial ordered list \( R_{\text{retriever}} = [e_1, e_2, ..., e_{|E|}] \) based on a predefined scoring function. The Knowledge Prompt then provides structured in-context learning examples to guide the LLM, which subsequently refines the top-\( m \) candidates, producing a reranked list \( R_{\text{LLM}} = [e'_1, e'_2, ..., e'_m] \).
+KICGPT primarily consists of three components, as illustrated in \cref{fig:KICGPTarchitecture}: a triple-based KGC retriever, a Knowledge Prompt module, and an LLM-based reranker. Given a query triple \( (h, r, ?) \) from a KG \(G\) consisting of set of entities \(E\) and relations \(R\), the retriever computes a ranking over all possible entities \( e \in E \), generating an initial ordered list \( R_{\text{retriever}} = [e_1, e_2, ..., e_{|E|}] \) based on a predefined scoring function. The Knowledge Prompt then provides structured in-context learning examples to guide the LLM, which subsequently refines the top-\( m \) candidates, producing a reranked list \( R_{\text{LLM}} = [e'_1, e'_2, ..., e'_m] \).
 The final output of KICGPT combines the LLM’s refined ranking with the remaining entities from the retriever, yielding the final entity ranking:
 
 \[
