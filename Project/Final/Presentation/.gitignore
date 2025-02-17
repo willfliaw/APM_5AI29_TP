@@ -6,4 +6,7 @@
 *.out
 *.synctex.gz
 *.blg
+*.nav
+*.snm
+*.toc
 main.pdf
