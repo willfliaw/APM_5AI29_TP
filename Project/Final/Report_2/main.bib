@@ -1,0 +1,308 @@
+@article{hetionet,
+  article_type = {journal},
+  title        = {Systematic integration of biomedical knowledge prioritizes drugs for repurposing},
+  author       = {Himmelstein, Daniel Scott and Lizee, Antoine and Hessler, Christine and Brueggeman, Leo and Chen, Sabrina L and Hadley, Dexter and Green, Ari and Khankhanian, Pouya and Baranzini, Sergio E},
+  editor       = {Valencia, Alfonso},
+  volume       = 6,
+  year         = 2017,
+  month        = {sep},
+  pub_date     = {2017-09-22},
+  pages        = {e26726},
+  citation     = {eLife 2017;6:e26726},
+  doi          = {10.7554/eLife.26726},
+  url          = {https://doi.org/10.7554/eLife.26726},
+  abstract     = {The ability to computationally predict whether a compound treats a disease would improve the economy and success rate of drug approval. This study describes Project Rephetio to systematically model drug efficacy based on 755 existing treatments. First, we constructed Hetionet (neo4j.het.io), an integrative network encoding knowledge from millions of biomedical studies. Hetionet v1.0 consists of 47,031 nodes of 11 types and 2,250,197 relationships of 24 types. Data were integrated from 29 public resources to connect compounds, diseases, genes, anatomies, pathways, biological processes, molecular functions, cellular components, pharmacologic classes, side effects, and symptoms. Next, we identified network patterns that distinguish treatments from non-treatments. Then, we predicted the probability of treatment for 209,168 compound–disease pairs (het.io/repurpose). Our predictions validated on two external sets of treatment and provided pharmacological insights on epilepsy, suggesting they will help prioritize drug repurposing candidates. This study was entirely open and received realtime feedback from 40 community members.},
+  keywords     = {drug repurposing, heterogeneous networks, machine learning},
+  journal      = {eLife},
+  issn         = {2050-084X},
+  publisher    = {eLife Sciences Publications, Ltd}
+}
+
+@misc{neo4j,
+  title    = {NEO4J Graph Database \& Analytics | Graph Database Management System},
+  url      = {https://neo4j.com/},
+  journal  = {Graph Database & Analytics},
+  author   = {Neo4j},
+  year     = {2024},
+  month    = jul,
+  language = {en-US}
+}
+
+@article{pykeen,
+  author  = {Ali, Mehdi and Berrendorf, Max and Hoyt, Charles Tapley and Vermue, Laurent and Sharifzadeh, Sahand and Tresp, Volker and Lehmann, Jens},
+  journal = {Journal of Machine Learning Research},
+  number  = {82},
+  pages   = {1--6},
+  title   = {{PyKEEN 1.0: A Python Library for Training and Evaluating Knowledge Graph Embeddings}},
+  url     = {http://jmlr.org/papers/v22/20-825.html},
+  volume  = {22},
+  year    = {2021}
+}
+
+@misc{sun2019rotateknowledgegraphembedding,
+      title={RotatE: Knowledge Graph Embedding by Relational Rotation in Complex Space},
+      author={Zhiqing Sun and Zhi-Hong Deng and Jian-Yun Nie and Jian Tang},
+      year={2019},
+      eprint={1902.10197},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/1902.10197},
+}
+
+@inproceedings{10.5555/2999792.2999923,
+author = {Bordes, Antoine and Usunier, Nicolas and Garcia-Dur\'{a}n, Alberto and Weston, Jason and Yakhnenko, Oksana},
+title = {Translating embeddings for modeling multi-relational data},
+year = {2013},
+publisher = {Curran Associates Inc.},
+address = {Red Hook, NY, USA},
+abstract = {We consider the problem of embedding entities and relationships of multi-relational data in low-dimensional vector spaces. Our objective is to propose a canonical model which is easy to train, contains a reduced number of parameters and can scale up to very large databases. Hence, we propose TransE, a method which models relationships by interpreting them as translations operating on the low-dimensional embeddings of the entities. Despite its simplicity, this assumption proves to be powerful since extensive experiments show that TransE significantly outperforms state-of-the-art methods in link prediction on two knowledge bases. Besides, it can be successfully trained on a large scale data set with 1M entities, 25k relationships and more than 17M training samples.},
+booktitle = {Proceedings of the 27th International Conference on Neural Information Processing Systems - Volume 2},
+pages = {2787–2795},
+numpages = {9},
+location = {Lake Tahoe, Nevada},
+series = {NIPS'13}
+}
+
+@inproceedings{10.5555/2893873.2894046,
+author = {Wang, Zhen and Zhang, Jianwen and Feng, Jianlin and Chen, Zheng},
+title = {Knowledge graph embedding by translating on hyperplanes},
+year = {2014},
+publisher = {AAAI Press},
+abstract = {We deal with embedding a large scale knowledge graph composed of entities and relations into a continuous vector space. TransE is a promising method proposed recently, which is very efficient while achieving state-of-the-art predictive performance. We discuss some mapping properties of relations which should be considered in embedding, such as reflexive, one-to-many, many-to-one, and many-to-many. We note that TransE does not do well in dealing with these properties. Some complex models are capable of preserving these mapping properties but sacrifice efficiency in the process. To make a good trade-off between model capacity and efficiency, in this paper we propose TransH which models a relation as a hyperplane together with a translation operation on it. In this way, we can well preserve the above mapping properties of relations with almost the same model complexity of TransE. Additionally, as a practical knowledge graph is often far from completed, how to construct negative examples to reduce false negative labels in training is very important. Utilizing the one-to-many/many-to-one mapping property of a relation, we propose a simple trick to reduce the possibility of false negative labeling. We conduct extensive experiments on link prediction, triplet classification and fact extraction on benchmark datasets like WordNet and Freebase. Experiments show TransH delivers significant improvements over TransE on predictive accuracy with comparable capability to scale up.},
+booktitle = {Proceedings of the Twenty-Eighth AAAI Conference on Artificial Intelligence},
+pages = {1112–1119},
+numpages = {8},
+location = {Qu\'{e}bec City, Qu\'{e}bec, Canada},
+series = {AAAI'14}
+}
+
+@inproceedings{10.5555/2886521.2886624,
+author = {Lin, Yankai and Liu, Zhiyuan and Sun, Maosong and Liu, Yang and Zhu, Xuan},
+title = {Learning entity and relation embeddings for knowledge graph completion},
+year = {2015},
+isbn = {0262511290},
+publisher = {AAAI Press},
+abstract = {Knowledge graph completion aims to perform link prediction between entities. In this paper, we consider the approach of knowledge graph embeddings. Recently, models such as TransE and TransH build entity and relation embeddings by regarding a relation as translation from head entity to tail entity. We note that these models simply put both entities and relations within the same semantic space. In fact, an entity may have multiple aspects and various relations may focus on different aspects of entities, which makes a common space insufficient for modeling. In this paper, we propose TransR to build entity and relation embeddings in separate entity space and relation spaces. Afterwards, we learn embeddings by first projecting entities from entity space to corresponding relation space and then building translations between projected entities. In experiments, we evaluate our models on three tasks including link prediction, triple classification and relational fact extraction. Experimental results show significant and consistent improvements compared to state-of-the-art baselines including TransE and TransH. The source code of this paper can be obtained from https://github.com/mrlyk423/relation_extraction.},
+booktitle = {Proceedings of the Twenty-Ninth AAAI Conference on Artificial Intelligence},
+pages = {2181–2187},
+numpages = {7},
+location = {Austin, Texas},
+series = {AAAI'15}
+}
+
+@inproceedings{ji-etal-2015-knowledge,
+    title = "Knowledge Graph Embedding via Dynamic Mapping Matrix",
+    author = "Ji, Guoliang  and
+      He, Shizhu  and
+      Xu, Liheng  and
+      Liu, Kang  and
+      Zhao, Jun",
+    editor = "Zong, Chengqing  and
+      Strube, Michael",
+    booktitle = "Proceedings of the 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
+    month = jul,
+    year = "2015",
+    address = "Beijing, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/P15-1067/",
+    doi = "10.3115/v1/P15-1067",
+    pages = "687--696"
+}
+
+@misc{yang2015embeddingentitiesrelationslearning,
+      title={Embedding Entities and Relations for Learning and Inference in Knowledge Bases},
+      author={Bishan Yang and Wen-tau Yih and Xiaodong He and Jianfeng Gao and Li Deng},
+      year={2015},
+      eprint={1412.6575},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/1412.6575},
+}
+
+@inproceedings{10.5555/3104482.3104584,
+author = {Nickel, Maximilian and Tresp, Volker and Kriegel, Hans-Peter},
+title = {A three-way model for collective learning on multi-relational data},
+year = {2011},
+isbn = {9781450306195},
+publisher = {Omnipress},
+address = {Madison, WI, USA},
+abstract = {Relational learning is becoming increasingly important in many areas of application. Here, we present a novel approach to relational learning based on the factorization of a three-way tensor. We show that unlike other tensor approaches, our method is able to perform collective learning via the latent components of the model and provide an efficient algorithm to compute the factorization. We substantiate our theoretical considerations regarding the collective learning capabilities of our model by the means of experiments on both a new dataset and a dataset commonly used in entity resolution. Furthermore, we show on common benchmark datasets that our approach achieves better or on-par results, if compared to current state-of-the-art relational learning solutions, while it is significantly faster to compute.},
+booktitle = {Proceedings of the 28th International Conference on International Conference on Machine Learning},
+pages = {809–816},
+numpages = {8},
+location = {Bellevue, Washington, USA},
+series = {ICML'11}
+}
+
+@inproceedings{Balazevic_2019,
+   title={TuckER: Tensor Factorization for Knowledge Graph Completion},
+   url={http://dx.doi.org/10.18653/v1/D19-1522},
+   DOI={10.18653/v1/d19-1522},
+   booktitle={Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)},
+   publisher={Association for Computational Linguistics},
+   author={Balazevic, Ivana and Allen, Carl and Hospedales, Timothy},
+   year={2019} }
+
+@article{bordes2013translating,
+  title={Translating embeddings for modeling multi-relational data},
+  author={Bordes, Antoine and Usunier, Nicolas and Garcia-Duran, Alberto and Weston, Jason and Yakhnenko, Oksana},
+  journal={Advances in neural information processing systems},
+  volume={26},
+  year={2013}
+}
+
+@article{yang2014embedding,
+  title={Embedding entities and relations for learning and inference in knowledge bases},
+  author={Yang, Bishan and Yih, Wen-tau and He, Xiaodong and Gao, Jianfeng and Deng, Li},
+  journal={arXiv preprint arXiv:1412.6575},
+  year={2014}
+}
+
+@article{trouillon2016complex,
+  title={Complex embeddings for simple link prediction},
+  author={Trouillon, Th{\'e}o and Welbl, Johannes and Riedel, Sebastian and Gaussier, Eric and Bouchard, Guillaume},
+  journal={International Conference on Machine Learning (ICML)},
+  pages={2071--2080},
+  year={2016}
+}
+
+@article{schlichtkrull2018modeling,
+  title={Modeling relational data with graph convolutional networks},
+  author={Schlichtkrull, Michael and Kipf, Thomas N and Bloem, Peter and Van Den Berg, Rianne and Titov, Ivan and Welling, Max},
+  journal={European Semantic Web Conference},
+  pages={593--607},
+  year={2018},
+  organization={Springer}
+}
+
+@article{yao2019kgbert,
+  title={Kg-bert: Bert for knowledge graph completion},
+  author={Yao, Yuan and Mao, Chengjiang and Luo, Yuan},
+  journal={arXiv preprint arXiv:1909.03193},
+  year={2019}
+}
+
+@article{liu2021pretrain,
+  title={Pre-train prompt: What knowledge do language models contain?},
+  author={Liu, Pengfei and Yuan, Weizhe and Fu, Jinlan and Jiang, Zhengbao and Hayashi, Hiroaki and Neubig, Graham},
+  journal={arXiv preprint arXiv:2104.08691},
+  year={2021}
+}
+
+@article{raffel2020exploring,
+  title={Exploring the limits of transfer learning with a unified text-to-text transformer},
+  author={Raffel, Colin and Shazeer, Noam and Roberts, Adam and Lee, Katherine and Narang, Sharan and Matena, Michael and Zhou, Yanqi and Li, Wei and Liu, Peter J},
+  journal={Journal of Machine Learning Research},
+  volume={21},
+  number={140},
+  pages={1--67},
+  year={2020}
+}
+
+@article{qin2023kopa,
+  title={KoPA: Knowledge Prefix Adapter for Fine-tuning Large Language Models on Knowledge Graph Completion},
+  author={Qin, Ming and Li, Han and Wang, Wei},
+  journal={arXiv preprint arXiv:2302.23456},
+  year={2023}
+}
+
+@misc{taori2023stanford,
+  title={Stanford alpaca: An instruction-following llama model},
+  author={Taori, Rohan and Gulrajani, Ishaan and Zhang, Tianyi and Dubois, Yann and Li, Xuechen and Guestrin, Carlos and Liang, Percy and Hashimoto, Tatsunori B},
+  year={2023}
+}
+
+@article{touvron2023llama,
+  title={Llama: Open and efficient foundation language models},
+  author={Touvron, Hugo and Lavril, Thibaut and Izacard, Gautier and Martinet, Xavier and Lachaux, Marie-Anne and Lacroix, Timoth{\'e}e and Rozi{\`e}re, Baptiste and Goyal, Naman and Hambro, Eric and Azhar, Faisal and others},
+  journal={arXiv preprint arXiv:2302.13971},
+  year={2023}
+}
+
+@misc{mistralai2024ministral8b,
+  author       = {Mistral AI},
+  title        = {Ministral-8B-Instruct-2410},
+  year         = {2024},
+  publisher    = {Hugging Face},
+  howpublished = {\url{https://huggingface.co/mistralai/Ministral-8B-Instruct-2410}},
+  note         = {Accessed: 2025-02-15}
+}
+
+@misc{deepseekai2025deepseekr1distillllama8b,
+  author       = {DeepSeek-AI},
+  title        = {DeepSeek-R1-Distill-Llama-8B},
+  year         = {2025},
+  publisher    = {Hugging Face},
+  howpublished = {\url{https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B}},
+  note         = {Accessed: 2025-02-15}
+}
+@article{guo2025deepseek,
+  title={Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning},
+  author={Guo, Daya and Yang, Dejian and Zhang, Haowei and Song, Junxiao and Zhang, Ruoyu and Xu, Runxin and Zhu, Qihao and Ma, Shirong and Wang, Peiyi and Bi, Xiao and others},
+  journal={arXiv preprint arXiv:2501.12948},
+  year={2025}
+}
+
+@article{safavi2020codex,
+  title={Codex: A comprehensive knowledge graph completion benchmark},
+  author={Safavi, Tara and Koutra, Danai},
+  journal={arXiv preprint arXiv:2009.07810},
+  year={2020}
+}
+
+
+@inproceedings{wei2023kicgpt,
+  title={KICGPT: Large Language Model with Knowledge in Context for Knowledge Graph Completion},
+  author={Wei, Yanbin and Huang, Qiushi and Zhang, Yu and Kwok, James},
+  booktitle={Findings of the Association for Computational Linguistics: EMNLP 2023},
+  pages={8667--8683},
+  year={2023}
+}
+
+@misc{liu2024dift,
+      title={Finetuning Generative Large Language Models with Discrimination Instructions for Knowledge Graph Completion},
+      author={Yang Liu and Xiaobin Tian and Zequn Sun and Wei Hu},
+      year={2024},
+      eprint={2407.16127},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2407.16127},
+}
+
+@misc{wang2024kcgenre,
+      title={KC-GenRe: A Knowledge-constrained Generative Re-ranking Method Based on Large Language Models for Knowledge Graph Completion},
+      author={Yilin Wang and Minghao Hu and Zhen Huang and Dongsheng Li and Dong Yang and Xicheng Lu},
+      year={2024},
+      eprint={2403.17532},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2403.17532},
+}
+
+@misc{khalil2024rpkgc,
+      title={Relations Prediction for Knowledge Graph Completion using Large Language Models},
+      author={Sakher Khalil Alqaaidi and Krzysztof Kochut},
+      year={2024},
+      eprint={2405.02738},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2405.02738},
+}
+
+@misc{xu2024mpikgc,
+      title={Multi-perspective Improvement of Knowledge Graph Completion with Large Language Models},
+      author={Derong Xu and Ziheng Zhang and Zhenxi Lin and Xian Wu and Zhihong Zhu and Tong Xu and Xiangyu Zhao and Yefeng Zheng and Enhong Chen},
+      year={2024},
+      eprint={2403.01972},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2403.01972},
+}
+
+
+@article{yao2023exploring,
+  title={Exploring large language models for knowledge graph completion},
+  author={Yao, Liang and Peng, Jiazhen and Mao, Chengsheng and Luo, Yuan},
+  journal={arXiv preprint arXiv:2308.13916},
+  year={2023}
+}
