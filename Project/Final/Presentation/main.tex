@@ -120,11 +120,19 @@
     \end{itemize}
 
     \vspace{0.3cm}
-    \begin{center}
+        \begin{center}
         \begin{tikzpicture}
-            \node[draw, rectangle, fill=yellow!20] (prompt) at (0,0) {Prompt-Based KGC};
-            \node[draw, rectangle, fill=red!20] (fine) at (8,0) {Fine-Tuned KGC};
-            \draw[->, thick] (prompt) -- node[above] {\small More Structured Learning} (fine);
+            % Gradient Bar
+            \shade[left color=green!50, right color=red!50] (0,-0.3) rectangle (8,0.3);
+
+            % Labels at Start, Middle, and End
+            \node[align=center] at (0,0.8) {\small Prompt-Based KGC};
+            % \node[align=center] at (4,0.8) {\small Hybrid Methods};
+            \node[align=center] at (8,0.8) {\small Fine-Tuned KGC};
+
+            % Arrow Showing Spectrum Progression
+            \draw[thick,->] (-0.5,0) -- (8.5,0);
+            \node[align=center] at (4,-0.8) {\small Increasing Model Adaptation};
         \end{tikzpicture}
     \end{center}
 
