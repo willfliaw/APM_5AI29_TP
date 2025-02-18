@@ -167,11 +167,6 @@ A knowledge graph consists of entities, relations, and triples of the form \( (h
 Due to the inherent incompleteness of KGs, KGC seeks to either predict missing entities or verify candidate triples.
 
 Although KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
-In this work, we consider two complementary tasks: \emph{link prediction} and \emph{triple classification}.
-This distinction arises from the differing nature of the evaluated approaches.
-While they could be adapted to a unified setting, doing so would require substantial modifications that could alter their original design, and we therefore refrained from doining so at the cost of having two slightly different problem formulations.
-
-Although KGC is often framed as a single task, different methodological approaches necessitate distinct problem formulations.
 In this work, we focus on two complementary tasks: \emph{link prediction} and \emph{triple classification}.
 This distinction reflects the differences in the evaluated approaches.
 While it is certainly possible to adapt both approaches to a unified setting, doing so would require significant modifications that could change their original design.
@@ -238,8 +233,8 @@ Following the analysis in \cref{sec:background}, we now outline our methodologic
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/KICGPTarchitecture}
-    \caption{KICGPT architecture, consisting of a triple-based KGC retriever, the \emph{Knowledge Prompt}, and an LLM-based reranker.}
+    \includegraphics[width=0.99\textwidth]{figures/KICGPTarchitecture}
+    \caption{KICGPT architecture, consisting of a triple-based KGC retriever, the \emph{Knowledge Prompt}, and an LLM-based reranker \cite{wei2023kicgpt}.}
     \label{fig:KICGPTarchitecture}
 \end{figure}
 
@@ -280,8 +275,10 @@ This ensures consistent formatting across queries and demonstrations, making the
     \item \textbf{Task Description:} The prompt begins with a responsibility statement that explicitly clarifies the LLM’s role in ranking candidate entities based on relational context.
     \item \textbf{Query Introduction:} The incomplete triple \( (h, r, ?) \) is presented, ensuring the model understands the missing component it must predict.
     \item \textbf{Demonstration Explanation:} The two sources of contextual examples, analogy-based triples \( L_a \) and supplement-based triples \( L_s \), are described so that the LLM can recognize their significance in guiding predictions.
-    \item \textbf{Demonstration Integration:} Selected triples from \( L_a \) and \( L_s \) are appended to the prompt. The number of demonstrations is maximized within the LLM’s token limit to provide sufficient context.
-    \item \textbf{Re-Ranking and Final Prediction:} The LLM processes the structured prompt and re-ranks the top-\( m \) candidates, producing an ordered list \( R_{\text{LLM}} \). The highest-ranked entities from this list replace the corresponding top-\( m \) results from the retriever, yielding the final ranking.
+    \item \textbf{Demonstration Integration:} Selected triples from \( L_a \) and \( L_s \) are appended to the prompt.
+    The number of demonstrations is maximized within the LLM’s token limit to provide sufficient context.
+    \item \textbf{Re-Ranking and Final Prediction:} The LLM processes the structured prompt and re-ranks the top-\( m \) candidates, producing an ordered list \( R_{\text{LLM}} \).
+    The highest-ranked entities from this list replace the corresponding top-\( m \) results from the retriever, yielding the final ranking.
 \end{itemize}
 
 
@@ -289,8 +286,8 @@ This ensures consistent formatting across queries and demonstrations, making the
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/KoPAarchitecture}
-    \caption{KoPA architecture, illustrating the integration of structural embeddings with an LLM via the Knowledge Prefix Adapter.}
+    \includegraphics[width=0.99\textwidth]{figures/KoPAarchitecture}
+    \caption{KoPA architecture: Entities and relations are converted into empeddings, which after adaptation can then be incooperated directly into the LLM \cite{qin2023kopa}.}
     \label{fig:KoPAarchitecture}
 \end{figure}
 
@@ -299,7 +296,8 @@ By leveraging structured KG embeddings, KoPA enhances the LLM’s ability to dis
 As illustrated in \cref{fig:KoPAarchitecture}, the model combines structural embeddings with a knowledge prefix adapter, enabling a seamless fusion of KG-based constraints with LLM inference.
 
 \subsubsection{Structural Embeddings}
-To integrate KG structure, each entity \( e \) and relation \( r \) is mapped into a latent vector space, where relational dependencies are preserved. The learned embeddings, denoted as \( \mathbf{e} \in \mathbb{R}^{d_e} \) for entities and \( \mathbf{r} \in \mathbb{R}^{d_r} \) for relations, capture topological and semantic information from the KG. A scoring function \( F(h, r, t) = \mathbf{h}^\top \mathbf{W_r} \mathbf{t} \), where \( \mathbf{h}, \mathbf{t} \) are entity embeddings and \( \mathbf{W_r} \) is a relation-specific transformation matrix, is used to estimate the plausibility of a triple.
+To integrate KG structure, each entity \( e \) and relation \( r \) is mapped into a latent vector space, where relational dependencies are preserved.
+The learned embeddings, denoted as \( \mathbf{e} \in \mathbb{R}^{d_e} \) for entities and \( \mathbf{r} \in \mathbb{R}^{d_r} \) for relations, capture topological and semantic information from the KG. A scoring function \( F(h, r, t) = \mathbf{h}^\top \mathbf{W_r} \mathbf{t} \), where \( \mathbf{h}, \mathbf{t} \) are entity embeddings and \( \mathbf{W_r} \) is a relation-specific transformation matrix, is used to estimate the plausibility of a triple.
 
 These embeddings are pre-trained using self-supervised learning, ensuring that relational constraints are reflected in the representation space.
 Unlike textual descriptions, which can be noisy or incomplete, structured embeddings provide a more direct way of modeling entity relationships.
@@ -307,7 +305,8 @@ By aligning embeddings with the LLM’s input, KoPA ensures that structural info
 
 \subsubsection{Knowledge Prefix Adapter}
 
-To bridge structured embeddings with the LLM’s textual processing, KoPA employs a \textit{Knowledge Prefix Adapter} (KPA). This adapter transforms structured embeddings into a virtual prefix, effectively mapping entity and relation representations into the model’s input space. Given a triple \( (h, r, t) \), the adapter projects its corresponding embeddings \( \mathbf{h}, \mathbf{r}, \mathbf{t} \) into a sequence of virtual tokens, denoted as \( K = P(\mathbf{h}) \oplus P(\mathbf{r}) \oplus P(\mathbf{t}) \), where \( P \) is a learned transformation function.
+To bridge structured embeddings with the LLM’s textual processing, KoPA employs a \textit{Knowledge Prefix Adapter} (KPA).
+This adapter transforms structured embeddings into a virtual prefix, effectively mapping entity and relation representations into the model’s input space. Given a triple \( (h, r, t) \), the adapter projects its corresponding embeddings \( \mathbf{h}, \mathbf{r}, \mathbf{t} \) into a sequence of virtual tokens, denoted as \( K = P(\mathbf{h}) \oplus P(\mathbf{r}) \oplus P(\mathbf{t}) \), where \( P \) is a learned transformation function.
 
 The knowledge prefix is prepended to the LLM’s textual input, allowing the model to condition its predictions on structured KG information.
 This approach ensures that the model retains relational constraints while maintaining flexibility in handling natural language inputs.
@@ -330,6 +329,102 @@ The LLM is fine-tuned on the instruction-following task to optimize its triple c
 
 
 \section{Experiments}\label{sec:experiments}
+
+\subsection{Datasets}
+
+For our experiments, we used two widely adopted KGC benchmarks, which are summarized in \cref{tab:datasets}.
+
+\paragraph{WN18RR} is a filtered version of WN18~\cite{wn18rr}, derived from WordNet~\cite{wordnet}, designed to eliminate inverse relations that previously made link prediction trivial.
+This refinement increases task difficulty, requiring models to generalize beyond simple pattern recognition.
+
+\paragraph{CoDeX-S} (Complex Dataset Extracted from Wikidata~\cite{wikidata}) is a subset of CoDeX~\cite{safavi2020codex}, offering a diverse set of relational facts.
+Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikidata, ensuring a richer relational structure with a more balanced distribution of relations.
+
+\begin{table}
+    \centering
+    \begin{tabular}{l c c c c c}
+        \hline
+        Dataset & \#Entities & \#Relations & \#Train & \#Test \\
+        \hline
+        WN18RR & 40,943 & 11 & 86,835 & 3,134 \\
+        CoDeX-S & 2,034 & 42 & 32,888 & 3,654 \\
+        \hline
+    \end{tabular}
+    \caption{Statistics of the datasets used in our experiments.}
+    \label{tab:datasets}
+\end{table}
+
+\subsection{Language Models}
+
+To evaluate model performance across different architectures, we consider three language models with distinct capabilities:
+
+\paragraph{Alpaca-7B}~\cite{taori2023stanford} is a fine-tuned variant of LLaMA 7B, trained on 52,000 instruction-response pairs generated by OpenAI’s text-davinci-003.
+Optimized for general instruction-following, it serves as a lightweight baseline.
+
+\paragraph{Mistral-8B-Instruct-2410}~\cite{mistralai2024ministral8b} is an 8-billion-parameter model designed for instruction-based tasks, featuring a 128k-token context window and multilingual support.
+Compared to Alpaca-7B, it benefits from a slightly larger model size, extended context length, and improved cross-lingual capabilities.
+
+\paragraph{DeepSeek-R1-Distill-Llama-8B}~\cite{deepseekai2025deepseekr1distillllama8b} is a distilled version of DeepSeek-R1~\cite{guo2025deepseek}, optimized for reasoning and problem-solving.
+With a strong emphasis on mathematical and coding tasks, it is particularly effective in structured problem domains.
+
+
+\subsection{Evaluation of the KICGPT Approach}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                ybar, bar width=12pt,
+                symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+                xtick=data, ymin=0, ymax=0.7, ylabel={Score}, width=12cm, height=7cm, grid=both,
+                major grid style={line width=.2pt, draw=gray!30},
+                minor grid style={draw=gray!10},
+                enlarge x limits=0.2,
+                % Legend placed below with spacing:
+                legend style={
+                        at={(0.5,-0.15)}, anchor=north,
+                        /tikz/every even column/.append style={column sep=10pt},
+                        legend columns=4, draw=none, fill=none, font=\small
+                    }]
+            % Bars
+            \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
+            \addlegendentry{ChatGPT}
+            \addplot[fill=teal]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
+            \addlegendentry{\modelministral}
+            \addplot[fill=purple] coordinates {(MRR,0.2700) (Hits@1,0.1233) (Hits@3,0.2994) (Hits@10,0.6145)};
+            \addlegendentry{\modeldeepseek}
+            \addplot[fill=magenta] coordinates {(MRR,0.2461) (Hits@1,0.0980) (Hits@3,0.2580) (Hits@10,0.6120)};
+            \addlegendentry{\modeldeepseek Zeroshot}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Comparison of our results on the WN18RR test set with those from Wei et al.~\cite{wei2023kicgpt} (shown in gray). We evaluated \modelalpaca and \modeldeepseek using the same methodology, but also including a zero-shot setting.
+}
+    \label{fig:link_ordering}
+\end{figure}
+
+All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU with 24 GiB of VRAM, an Intel Xeon W-1270P CPU running at 3.80 GHz, and 64 GB of RAM.
+
+As previously discussed, this approach does not require modifications to the models themselves.
+However, while the original implementation relied on the ChatGPT API, we adapted it to locally running models.
+Specifically, in \cref{fig:link_ordering} we evaluated \modelministral and \modeldeepseek, comparing their performance against the results reported by Wei et al.~\cite{wei2023kicgpt}.
+
+\modelministral followed prompt instructions closely and rarely produced unparsable output.
+However, it significantly underperformed compared to the original study,
+which we tentatively attribute to ChatGPT-3.5’s superior general knowledge and reasoning capabilities.
+
+\modeldeepseek demonstrated strong reasoning abilities inside its explicit thinking tags, effectively analyzing given options, recognizing patterns, and identifying preferable choices.
+However, this process was often excessively verbose, even when explicitly instructed to be concise.
+Additionally, it frequently truncated its final responses, replacing parts of the output with ellipses (\dots), likely due to a focus loss while reasoning about the problem.
+Moreover, \modeldeepseek sometimes disregarded specific prompt instructions, potentially because it is primarily tuned for mathematical and coding tasks.
+Since the full-size Deepseek-R1 model is known to suffer from degraded performance with few-shot prompting~\cite{guo2025deepseek}, a similar issue may affect this distilled variant.
+However, as the few-shot examples contain domain-specific information, removing them entirely could  also further reduce performance.
+
+Both models performed surprisingly on-par with ChatGPT in the Hits@10 evaluation.
+However, this is likely due to variations in output length rather than genuine ranking improvements.
+Since evaluation is based on the options generated by the LLM rather than the full ground-truth ranking, models that produce shorter responses inherently increase their chances of including the correct answer among the top-ranked candidates.
+
+
+\subsection{Evaluation of the KoPA Approach}
 
 \begin{figure}
     \centering
@@ -354,7 +449,7 @@ The LLM is fine-tuned on the instruction-following task to optimize its triple c
             \nextgroupplot[
                 title=\modelalpaca,
                 % Hide y-axis labels for alignment
-                ylabel=Loss
+                ylabel=Loss / Gradient Norm
             ]
             \addplot[smooth, thick, blue]
             table[x=epoch, y=loss, col sep=space]
@@ -414,179 +509,66 @@ The LLM is fine-tuned on the instruction-following task to optimize its triple c
         \end{tikzpicture}
     }
 
-    \caption{Fine-tuning of \modelalpaca and \modeldeepseek. Loss and gradient norm trends are shown separately for each model, along with a comparison of both losses. Figure and results from our work.}
-    \label{fig:training_comparison}
+    \caption{Our fine-tuning process of \modelalpaca and \modeldeepseek on the CoDeX-S dataset. Loss and gradient norm trends are shown separately for each model, along with a comparison of both losses.}
+    \label{fig:kopa_finetuning_process}
 \end{figure}
 
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}
-        \begin{axis}[
-                ybar,
-                bar width=12pt,
-                symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
-                xtick=data,
-                ymin=0,
-                ymax=0.7,
-                ylabel={Score},
-                width=12cm,
-                height=7cm,
-                grid=both,
-                major grid style={line width=.2pt, draw=gray!30},
-                minor grid style={draw=gray!10},
-                enlarge x limits=0.2,
-                % Legend placed below with spacing:
-                legend style={
-                        at={(0.5,-0.15)},
-                        anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=4,
-                        draw=none, % Remove box
-                        fill=none,
-                        font=\small
-                    }
-            ]
-
-            % Bars
-            \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
-            \addlegendentry{KICGPT}
-            \addplot[fill=teal]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
-            \addlegendentry{\modelministral}
-            \addplot[fill=purple] coordinates {(MRR,0.2700) (Hits@1,0.1233) (Hits@3,0.2994) (Hits@10,0.6145)};
-            \addlegendentry{\modeldeepseek}
-
-            \addplot[fill=violet] coordinates {(MRR,0.2461) (Hits@1,0.0980) (Hits@3,0.2580) (Hits@10,0.6120)};
-            \addlegendentry{\modeldeepseek Zeroshot}
-
-
-        \end{axis}
-    \end{tikzpicture}
-    \caption{Link Ordering Evaluation Metrics}
-    \label{fig:link_ordering}
-\end{figure}
-
-
-\subsection{Datasets}
-
-For our experiments, we used two widely adopted KGC benchmarks, which are summarized in \cref{tab:datasets}.
-
-\paragraph{WN18RR} is a filtered version of WN18~\cite{wn18rr}, derived from WordNet~\cite{wordnet}, designed to eliminate inverse relations that previously made link prediction trivial.
-This refinement increases task difficulty, requiring models to generalize beyond simple pattern recognition.
-
-\paragraph{CoDeX-S} (Complex Dataset Extracted from Wikidata~\cite{wikidata}) is a subset of CoDeX~\cite{safavi2020codex}, offering a diverse set of relational facts.
-Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikidata, ensuring a richer relational structure with a more balanced distribution of relations.
-
-\begin{table}
-    \centering
-    \begin{tabular}{l c c c c c}
-        \hline
-        Dataset & \#Entities & \#Relations & \#Train & \#Test \\
-        \hline
-        WN18RR & 40,943 & 11 & 86,835 & 3,134 \\
-        CoDeX-S & 2,034 & 42 & 32,888 & 3,654 \\
-        \hline
-    \end{tabular}
-    \caption{Statistics of the datasets used in our experiments.}
-    \label{tab:datasets}
-\end{table}
-
-\subsection{Language Models}
-
-To evaluate model performance across different architectures, we consider three language models with distinct capabilities:
-
-\paragraph{Alpaca-7B}~\cite{taori2023stanford} is a fine-tuned variant of LLaMA 7B, trained on 52,000 instruction-response pairs generated by OpenAI’s text-davinci-003.
-Optimized for general instruction-following, it serves as a lightweight baseline.
-
-\paragraph{Mistral-8B-Instruct-2410}~\cite{mistralai2024ministral8b} is an 8-billion-parameter model designed for instruction-based tasks, featuring a 128k-token context window and multilingual support.
-Compared to Alpaca-7B, it benefits from a slightly larger model size, extended context length, and improved cross-lingual capabilities.
-
-\paragraph{DeepSeek-R1-Distill-Llama-8B}~\cite{deepseekai2025deepseekr1distillllama8b} is a distilled version of DeepSeek-R1~\cite{guo2025deepseek}, optimized for reasoning and problem-solving.
-With a strong emphasis on mathematical and coding tasks, it is particularly effective in structured problem domains.
-
-
-\subsection{Evaluation of the KICGPT Approach}
-
-All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU with 24 GiB of VRAM, an Intel Xeon W-1270P CPU running at 3.80 GHz, and 64 GB of RAM.
-
-As previously discussed, this approach does not require modifications to the models themselves.
-However, while the original implementation relied on the ChatGPT API, we adapted it to locally running models.
-Specifically, in \cref{fig:link_ordering} we evaluated \modelministral and \modeldeepseek, comparing their performance against the results reported by Wei et al.~\cite{wei2023kicgpt}.
-
-\modelministral followed prompt instructions closely and rarely produced unparsable output.
-However, it significantly underperformed compared to the original study,
-which we tentatively attribute to ChatGPT-3.5’s superior general knowledge and reasoning capabilities.
-
-\modeldeepseek demonstrated strong reasoning abilities inside its explicit thinking tags, effectively analyzing given options, recognizing patterns, and identifying preferable choices.
-However, this process was often excessively verbose, even when explicitly instructed to be concise.
-Additionally, it frequently truncated its final responses, replacing parts of the output with ellipses (\dots), likely due to a focus loss while reasoning about the problem.
-Moreover, \modeldeepseek sometimes disregarded specific prompt instructions, potentially because it is primarily tuned for mathematical and coding tasks.
-Since the full-size Deepseek-R1 model is known to suffer from degraded performance with few-shot prompting~\cite{guo2025deepseek}, a similar issue may affect this distilled variant.
-However, as the few-shot examples contain domain-specific information, removing them entirely could  also further reduce performance.
-
-Both models performed surprisingly on-par with ChatGPT in the Hits@10 evaluation.
-However, this is likely due to variations in output length rather than genuine ranking improvements.
-Since evaluation is based on the options generated by the LLM rather than the full ground-truth ranking, models that produce shorter responses inherently increase their chances of including the correct answer among the top-ranked candidates.
-
-
-\subsection{Evaluation of the KoPA Approach}
 
 Following the procedure outlined in~\cref{sec:methodology}, we fine-tuned \modelalpaca on the CoDeX~\cite{safavi2020codex} dataset.
 The process took 10 hours and 12 minutes, with the model converging as expected.
-As shown in \cref{fig:training_comparison}, the training loss follows a slightly noisy downward trend, while the gradient norm exhibits significant fluctuations but generally decreases over time.
+As shown in \cref{fig:kopa_finetuning_process}, the training loss follows a slightly noisy downward trend, while the gradient norm exhibits significant fluctuations but generally decreases over time.
 
 Using the same setup, \modeldeepseek was fine-tuned in 9 hours and 56 minutes.
 Its loss curve closely resembles that of \modelalpaca, confirming stable convergence, though the gradient norm remains similarly volatile.
-A direct comparison reveals that both models exhibit nearly identical loss trajectories, suggesting comparable performance.
+A direct comparison reveals that both models exhibit nearly identical loss trajectories, which would suggest that they should have comparable performance.
 
-This expectation is confirmed in \cref{fig:codex_evaluation}, where both models achieve similar results.
-Evaluation times were 52 minutes for \modelalpaca and 56 minutes for \modeldeepseek.
-However, both models lag behind the performance reported in the original paper, though the cause remains unclear.
-Notably, they heavily favor predicting \textit{True}, resulting in exceptionally high recall but lower precision.
+We evaluated the prediction performance of \modelalpaca and \modeldeepseek on the CoDeX-S test set and compared our results to those reported by Qin et al.~\cite{qin2023kopa}.
+As shown in \cref{fig:codex_evaluation}, both models achieve similar overall results, with \modeldeepseek consistently lagging slightly behind \modelalpaca across all metrics.
+The evaluation process took 52 minutes for \modelalpaca and 56 minutes for \modeldeepseek.
 
-An important limitation of this fine-tuning approach is that \modeldeepseek does not engage in reasoning, as it is trained to generate the correct answer in its first token.
-Allowing it to reason could potentially improve performance, but this would require a different fine-tuning methodology.
+While we follow the same methodological approach as the original work, our results fall significantly short of the reported performance.
+The cause of this discrepancy is unclear, though possible explanations include minor differences in hyperparameters such as batch size and learning rate, which we had to adjust to accommodate our computational constraints.
+However, given the extent of the performance gap, it is unlikely that these adjustments alone fully explain the differences.
+
+A notable issue observed in both models is a strong bias toward classifying triples as true.
+Despite the test set containing an equal distribution of true and false triples (1828/1828), \modelalpaca classified 3472 triples as true and only 184 as false, while \modeldeepseek classified 3558 as true and only 98 as false.
+This skew results in exceptionally high recall, reaching up to 99\% for \modelalpaca, as the models only predict false when they are highly confident.
+A similar, though less extreme, bias is present in the results from Qin et al., where their model classified 2145 triples as true and 1511 as false.
+
+Another key limitation of our approach is that \modeldeepseek does not engage in explicit reasoning during prediction.
+Since the model is fine-tuned to generate the correct answer in its first token, it lacks the opportunity to analyze its choices before committing to a response.
+Allowing for a reasoning step could potentially improve performance, but this would require a different fine-tuning strategy.
 
 
-\begin{figure}[ht]
+\begin{figure}
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-                ybar,
-                bar width=12pt,
+                ybar, bar width=12pt,
                 symbolic x coords={Accuracy, Precision, Recall, F1-score},
-                xtick=data,
-                ymin=0,
-                ymax=1,
-                ylabel={Score},
-                width=12cm,
-                height=7cm,
-                grid=both,
+                xtick=data, ymin=0, ymax=1,
+                ylabel={Score}, width=12cm, height=7cm, grid=both,
                 major grid style={line width=.2pt, draw=gray!30},
                 minor grid style={draw=gray!10},
                 enlarge x limits=0.2,
                 legend style={
-                        at={(0.5,-0.15)},
-                        anchor=north,
+                        at={(0.5,-0.15)}, anchor=north,
                         /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3,
-                        draw=none,
-                        fill=none,
-                        font=\small
-                    }
-            ]
+                        legend columns=3, draw=none, fill=none,
+                        font=\small}]
 
-            % Bars
             \addplot[fill=gray]   coordinates {(Accuracy,0.8274)  (Precision,0.7791)  (Recall,0.9141)  (F1-score,0.8411)};
-            \addlegendentry{KoPA}
+            \addlegendentry{\modelalpaca (Qin et al.~\cite{qin2023kopa})}
 
-            \addplot[fill=blue]   coordinates {(Accuracy,0.5027) (Precision,0.5014) (Recall,0.9759) (F1-score,0.6625)};
+            \addplot[fill=blue] coordinates {(Accuracy,0.5465) (Precision,0.5245) (Recall,0.9962) (F1-score,0.6872)};
+            \addlegendentry{\modelalpaca}
+
+            \addplot[fill=purple]   coordinates {(Accuracy,0.5027) (Precision,0.5014) (Recall,0.9759) (F1-score,0.6625)};
             \addlegendentry{\modeldeepseek}
 
-            \addplot[fill=purple] coordinates {(Accuracy,0.5465) (Precision,0.5245) (Recall,0.9962) (F1-score,0.6872)};
-            \addlegendentry{\modelalpaca}
         \end{axis}
     \end{tikzpicture}
-    \caption{CoDeX Performance Evaluation Metrics}
+    \caption{Comparison of our replication of the original results from Qin et al.~\cite{qin2023kopa} using \modelalpaca, along with our additional results from \modeldeepseek, all evaluated on the CoDeX-S test set.}
     \label{fig:codex_evaluation}
 \end{figure}
 
