@@ -521,7 +521,7 @@ However, given the extent of the performance gap, it is very unlikely that these
 A notable issue observed in both models is a strong bias toward classifying triples as true.
 Despite the test set containing an equal distribution of true and false triples (1828/1828), \modelalpaca classified 3472 triples as true and only 184 as false, while \modeldeepseek classified 3558 as true and only 98 as false.
 This skew results in exceptionally high recall, reaching up to 99\% for \modelalpaca, as the models only predict false when they are highly confident.
-A similar, though less extreme, bias is present in the results from Qin et al., where their model classified 2145 triples as true and 1511 as false.
+A similar, though less extreme, bias is present in the results from Qin et al.~\cite{qin2023kopa}, where their model classified 2145 triples as true and 1511 as false.
 
 Another key limitation of our approach is that \modeldeepseek does not engage in explicit reasoning during prediction.
 Since the model is fine-tuned to generate the correct answer in its first token, it lacks the opportunity to analyze its choices before committing to a response.
@@ -599,9 +599,8 @@ Future research may focus on hybrid strategies that jointly leverage the prompt-
 
 \bibliography{main}
 
+\pagebreak
 \appendix
-
-
 \section{Detailled Results}
 
 In \cref{tab:kicgpt_detailed_comparison}, we extend the detailed comparisons from Wei et al.~\cite{wei2023kicgpt} to include our results, and similarly, in \cref{tab:kopa_detailled_comparison}, we incorporate our findings alongside those of Qin et al.~\cite{qin2023kopa}.

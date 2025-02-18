@@ -85,7 +85,7 @@
     %\vspace{-0.3cm}
     %\small{Fig: Predicting missing tail entity for a given head and relation.}\\
 
-\textit{\textbf{2. Triple Classification}} % - Verify the validity of a given triple (h, r, t)
+    \textit{\textbf{2. Triple Classification}} % - Verify the validity of a given triple (h, r, t)
     \begin{itemize}
         \item Provide a binary classification: \textbf{valid} or \textbf{invalid}.
     \end{itemize}
@@ -104,29 +104,29 @@
 
 \begin{frame}{Background - LLM-Based Approaches}
 
-\vspace{0.2cm}
-\textbf{\textit{1. Purely Prompt-Based Methods}}
-\begin{itemize}
-    \item Structured retrieval and in-context learning.
-    \item \textbf{KICGPT} – triple-based retriever and Knowledge Prompts.
-    %\item No need to fine-tune the LLM.
-\end{itemize}
+    \vspace{0.2cm}
+    \textbf{\textit{1. Purely Prompt-Based Methods}}
+    \begin{itemize}
+        \item Structured retrieval and in-context learning.
+        \item \textbf{KICGPT} – triple-based retriever and Knowledge Prompts.
+        %\item No need to fine-tune the LLM.
+    \end{itemize}
 
-\textbf{\textit{2. Fine-Tuning-Based Methods}}
-\begin{itemize}
-    \item KG structure into LLM parameters.
-    \item \textbf{KoPA} - Knowledge Prefix Adapter.
-    % \item Provides better \textbf{alignment} with KG schemas.
-\end{itemize}
+    \textbf{\textit{2. Fine-Tuning-Based Methods}}
+    \begin{itemize}
+        \item KG structure into LLM parameters.
+        \item \textbf{KoPA} - Knowledge Prefix Adapter.
+        % \item Provides better \textbf{alignment} with KG schemas.
+    \end{itemize}
 
-\vspace{0.3cm}
-\begin{center}
-    \begin{tikzpicture}
-        \node[draw, rectangle, fill=yellow!20] (prompt) at (0,0) {Prompt-Based KGC};
-        \node[draw, rectangle, fill=red!20] (fine) at (8,0) {Fine-Tuned KGC};
-        \draw[->, thick] (prompt) -- node[above] {\small More Structured Learning} (fine);
-    \end{tikzpicture}
-\end{center}
+    \vspace{0.3cm}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, rectangle, fill=yellow!20] (prompt) at (0,0) {Prompt-Based KGC};
+            \node[draw, rectangle, fill=red!20] (fine) at (8,0) {Fine-Tuned KGC};
+            \draw[->, thick] (prompt) -- node[above] {\small More Structured Learning} (fine);
+        \end{tikzpicture}
+    \end{center}
 
 \end{frame}
 
@@ -290,10 +290,44 @@
 
 \begin{frame}{Conclusion}
 
-    \begin{itemize}
-        \item Replicating results is hard
-        \item Something
-    \end{itemize}
+    \begin{columns}[t]
+        \column{0.40\textwidth}
+        \textbf{General}
+        \begin{itemize}
+            \item Replicating results is hard
+            \item No magic gains from reasoning
+        \end{itemize}
+
+        \column{0.55\textwidth}
+        \textbf{KICGPT}
+        \begin{itemize}
+            \item Fast deployment (no fine-tuning required)
+            \item Performance depends on LLM
+            \item Results may vary across models
+        \end{itemize}
+        \textbf{KoPA}
+        \begin{itemize}
+            \item Fine-tuning leverages KG structure
+            \item Requires more computational resources
+            \item Needs tuning to balance text and structure
+        \end{itemize}
+    \end{columns}
+    \vspace{4mm}
+    \begin{center}
+        \begin{tikzpicture}
+            % Gradient Bar
+            \shade[left color=yellow!20, right color=red!20] (0,-0.3) rectangle (8,0.3);
+
+            % Labels at Start, Middle, and End
+            \node[align=center] at (0,0.8) {\small Prompt-Based KGC};
+            \node[align=center] at (4,0.8) {\small Hybrid Methods};
+            \node[align=center] at (8,0.8) {\small Fine-Tuned KGC};
+
+            % Arrow Showing Spectrum Progression
+            \draw[thick,->] (-0.5,0) -- (8.5,0);
+            \node[align=center] at (4,-0.8) {\small Increasing Model Adaptation};
+        \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 %\begin{frame}{References}
