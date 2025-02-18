@@ -84,10 +84,11 @@
 \section{Methodology}
 %------------------------------------------------
 \begin{frame}{KICGPT: Retrieval-Augmented Prompting}
+    Ideas: \textbf{ranking of entities} and \textbf{in-context learning} (ICL)
     \begin{itemize}
-        \item Retrieve candidate entities from the knowledge graph.
-        \item Generate Knowledge Prompts for in-context learning.
-        \item Perform reranking using a large language model.
+        \item Retrieve candidate entities from the KG.
+        \item Generate Knowledge Prompts for ICL.
+        \item Perform reranking using a LLM.
     \end{itemize}
     \begin{figure}[h]
         \centering
@@ -96,19 +97,30 @@
     \end{figure}
 \end{frame}
 
+% talk about the following:
+% - abbreviation of KICGPT
+% - KICGPT main ideas: ranking of entities, ICL
+% - flow of KICGPT with example
+
 \begin{frame}{KoPA: Fine-Tuning-Based Triple Classification}
+    Ideas: integrate \textbf{KG structure as prefix} and \textbf{fine-tuning}
     \begin{itemize}
-        \item Uses Knowledge Prefix Adapter (KPA) to integrate KG structure.
-        \item Embeddings guide LLM reasoning.
+        \item Pre-training: extract structural information of entities and relations.
+        \item Uses Knowledge Prefix Adapter (KPA) to integrate KG structural embeddings $\rightarrow$ help LLM reasoning.
+        % \item Embeddings guide LLM reasoning.
         \item Fine-tuned LLM predicts validity of triples.
     \end{itemize}
     \begin{figure}[h]
         \centering
-        \includegraphics[width=0.8\linewidth]{images/KoPAarchitecture.png}
+        \includegraphics[width=0.9\linewidth]{images/KoPA.pdf}
         \caption{KoPA Architecture}
     \end{figure}
 \end{frame}
 
+% talk about the following:
+% - abbreviation of KoPA
+% - KoPA main ideas: integrate KG structure as prefix, fine-tuning
+% - flow of KoPA
 
 %------------------------------------------------
 \section{Experiments \& Discussion}
