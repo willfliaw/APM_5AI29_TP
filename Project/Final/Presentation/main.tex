@@ -71,8 +71,7 @@
     \vspace{0.3cm}
     \textbf{\textit{1. Link Prediction}} % - Predict a missing entity in (h, r, ?) or (?, r, t).
     \begin{itemize}
-        \item  Rank candidate entities by plausibility.
-        \item  Utilize structured retrieval and ranking mechanisms.
+        \item  Ranking of candidate entities.
     \end{itemize}
 
     \begin{center}
@@ -80,7 +79,7 @@
             \node[draw, circle] (h) at (0,0) {h};
             \node[draw, circle] (t) at (4,0) {?};
             \draw[->] (h) -- node[above] {r} (t);
-            \node[below] at (2,-0.5) {Predict 't' - (h, r, ?)};
+            \node[below] at (2,-0.5) {Predict `t' - (h, r, ?)};
         \end{tikzpicture}
     \end{center}
     %\vspace{-0.3cm}
@@ -89,7 +88,6 @@
 \textit{\textbf{2. Triple Classification}} % - Verify the validity of a given triple (h, r, t)
     \begin{itemize}
         \item Provide a binary classification: \textbf{valid} or \textbf{invalid}.
-        \item Use knowledge-infused prompts and fine-tuned models.
     \end{itemize}
 
     \begin{center}
@@ -106,7 +104,6 @@
 
 \begin{frame}{Background - LLM-Based Approaches}
 
-\textbf{\textit{LLM-Based KGC:}}\\
 \vspace{0.2cm}
 \textbf{\textit{1. Purely Prompt-Based Methods}}
 \begin{itemize}
@@ -131,22 +128,6 @@
     \end{tikzpicture}
 \end{center}
 
-\end{frame}
-
-% Slide 2: Prompt-Based vs Fine-Tuning-Based KGC
-\begin{frame}{Background - Early KGC to LLM-Based Approaches}
-\vspace{0.4cm}
-\begin{center}
-\textbf{\textit{Why Embedding to LLM ?}}
-\end{center}
-\vspace{0.2cm}
-\begin{center}
-    \begin{tikzpicture}
-        \node[draw, rectangle, fill=blue!20, minimum width=3cm] (early) at (0,0) {Early KGC};
-        \node[draw, rectangle, fill=green!20, minimum width=3cm] (llm) at (7,0) {LLM-Based KGC};
-        \draw[->, thick] (early) -- node[above] {\tiny Better Adaptability, No Retraining} (llm);
-    \end{tikzpicture}
-\end{center}
 \end{frame}
 
 %------------------------------------------------
