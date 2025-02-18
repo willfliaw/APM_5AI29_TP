@@ -38,15 +38,12 @@
 %----------------------------------------------------------------------------------------
 
 \title{Knowledge Graph Completion}
-\subtitle{Subtitle}
+\subtitle{}
 
 \author{Eddie Groh \and Mochamad Ardiansyah Nurgaha \and Sriraam Appakutti Palani \and William Liaw}
 
 \institute[Team: AWESome]
 {
-    Mehwish ALAM\\
-    Associate Professor
-    \and
     Language Models and Structured Data\\
 }
 \date{\today}
@@ -69,27 +66,87 @@
 %------------------------------------------------
 
 
-\section{Problem Statement \& Background}
-%------------------------------------------------
 \begin{frame}{Problem Statement}
-    \begin{block}{Knowledge Graph Completion (KGC)}
-        Aims to infer missing facts in a knowledge graph (KG), represented as \( G = (E, R, T) \).
-    \end{block}
+    \textbf{\textit{KGC infers missing facts in a knowledge graph.}}\\
+    \vspace{0.3cm}
+    \textbf{\textit{1. Link Prediction}} % - Predict a missing entity in (h, r, ?) or (?, r, t).
+    \begin{itemize}
+        \item  Rank candidate entities by plausibility.
+        \item  Utilize structured retrieval and ranking mechanisms.
+    \end{itemize}
 
-    \begin{columns}[c]
-        \column{.45\textwidth}
-        KGC involves key tasks:
-        \begin{itemize}
-            \item \textbf{Link Prediction}: Identifying missing entities by ranking candidate tail entities in an incomplete triple \( (h, r, ?) \).
-            \item \textbf{Triple Classification}: Determining whether a given triple \( (h, r, t) \) is valid.
-        \end{itemize}
-        \column{.45\textwidth}
-        \\LLM-based primary approaches:
-        \begin{itemize}
-            \item \textbf{Prompt-Based Methods} \\(e.g., KICGPT \cite{wei2023kicgpt})\\ Utilize structured retrieval and in-context learning for entity ranking.
-            \item \textbf{Fine-Tuning-Based Methods} \\(e.g., KoPA \cite{qin2023kopa})\\ Integrate structured knowledge into LLMs via additional training.
-        \end{itemize}
-    \end{columns}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle] (h) at (0,0) {h};
+            \node[draw, circle] (t) at (4,0) {?};
+            \draw[->] (h) -- node[above] {r} (t);
+            \node[below] at (2,-0.5) {Predict 't' - (h, r, ?)};
+        \end{tikzpicture}
+    \end{center}
+    %\vspace{-0.3cm}
+    %\small{Fig: Predicting missing tail entity for a given head and relation.}\\
+
+\textit{\textbf{2. Triple Classification}} % - Verify the validity of a given triple (h, r, t)
+    \begin{itemize}
+        \item Provide a binary classification: \textbf{valid} or \textbf{invalid}.
+        \item Use knowledge-infused prompts and fine-tuned models.
+    \end{itemize}
+
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle] (h2) at (0,0) {h};
+            \node[draw, circle] (t2) at (4,0) {t};
+            \draw[->] (h2) -- node[above] {r} (t2);
+            \node[below] at (2,-0.5) {Valid or Invalid?};
+        \end{tikzpicture}
+    \end{center}
+    %\small{Fig: Checking if a given relation between two entities is valid.}
+\end{frame}
+
+
+\begin{frame}{Background - LLM-Based Approaches}
+
+\textbf{\textit{LLM-Based KGC:}}\\
+\vspace{0.2cm}
+\textbf{\textit{1. Purely Prompt-Based Methods}}
+\begin{itemize}
+    \item Structured retrieval and in-context learning.
+    \item \textbf{KICGPT} – triple-based retriever and Knowledge Prompts.
+    %\item No need to fine-tune the LLM.
+\end{itemize}
+
+\textbf{\textit{2. Fine-Tuning-Based Methods}}
+\begin{itemize}
+    \item KG structure into LLM parameters.
+    \item \textbf{KoPA} - Knowledge Prefix Adapter.
+    % \item Provides better \textbf{alignment} with KG schemas.
+\end{itemize}
+
+\vspace{0.3cm}
+\begin{center}
+    \begin{tikzpicture}
+        \node[draw, rectangle, fill=yellow!20] (prompt) at (0,0) {Prompt-Based KGC};
+        \node[draw, rectangle, fill=red!20] (fine) at (8,0) {Fine-Tuned KGC};
+        \draw[->, thick] (prompt) -- node[above] {\small More Structured Learning} (fine);
+    \end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+% Slide 2: Prompt-Based vs Fine-Tuning-Based KGC
+\begin{frame}{Background - Early KGC to LLM-Based Approaches}
+\vspace{0.4cm}
+\begin{center}
+\textbf{\textit{Why Embedding to LLM ?}}
+\end{center}
+\vspace{0.2cm}
+\begin{center}
+    \begin{tikzpicture}
+        \node[draw, rectangle, fill=blue!20, minimum width=3cm] (early) at (0,0) {Early KGC};
+        \node[draw, rectangle, fill=green!20, minimum width=3cm] (llm) at (7,0) {LLM-Based KGC};
+        \draw[->, thick] (early) -- node[above] {\tiny Better Adaptability, No Retraining} (llm);
+    \end{tikzpicture}
+\end{center}
 \end{frame}
 
 %------------------------------------------------
@@ -130,7 +187,69 @@
 
 % Fine-tuning two models:
 % Alpaca: Used in original paper, optimized for instruction following
-% Deepseek
+% Deepseek: Distill from
+
+\begin{frame}{KICGPT: Prompting \hfill KoPA: Fine-tuning\hspace{20mm}}
+    \begin{columns}[c]
+        \centering
+        \column{.49\textwidth}
+        \begin{tikzpicture}
+            \begin{axis}[
+                ybar, bar width=6pt,
+                symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+                xtick=data, ymin=0, ymax=0.7, ylabel={Score}, width=\textwidth, height=6.5cm, grid=both,
+                major grid style={line width=.2pt, draw=gray!30},
+                minor grid style={draw=gray!10},
+                enlarge x limits=0.2,
+            % Legend placed below with spacing:
+                legend style={
+                    at={(0.5,-0.15)}, anchor=north,
+                    /tikz/every even column/.append style={column sep=10pt},
+                    legend columns=2, draw=none, fill=none, font=\small,
+                    nodes={anchor=west}
+                }]
+                % Bars
+                \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
+                \addlegendentry{ChatGPT-3.5}
+                \addplot[fill=teal]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
+                \addlegendentry{\modelministral}
+                \addplot[fill=purple] coordinates {(MRR,0.2700) (Hits@1,0.1233) (Hits@3,0.2994) (Hits@10,0.6145)};
+                \addlegendentry{\modeldeepseek}
+                \addplot[fill=magenta] coordinates {(MRR,0.2461) (Hits@1,0.0980) (Hits@3,0.2580) (Hits@10,0.6120)};
+                \addlegendentry{\modeldeepseek Zeroshot}
+            \end{axis}
+        \end{tikzpicture}
+        \column{.49\textwidth}
+        \begin{tikzpicture}
+            \begin{axis}[
+                ybar, bar width=6pt,
+                symbolic x coords={Acc, Precision, Recall, F1-score},
+                xtick=data, ymin=0, ymax=1,
+                ylabel={Score}, width=\linewidth, height=6.5cm, grid=both,
+                major grid style={line width=.2pt, draw=gray!30},
+                minor grid style={draw=gray!10},
+                enlarge x limits=0.2,
+                legend style={
+                    at={(0.5,-0.15)}, anchor=north,
+                    /tikz/every even column/.append style={column sep=10pt},
+                    legend columns=2, draw=none, fill=none,
+                    font=\small, nodes={anchor=west}}]
+
+                \addplot[fill=gray]   coordinates {(Acc,0.8274)  (Precision,0.7791)  (Recall,0.9141)  (F1-score,0.8411)};
+                \addlegendentry{\modelalpaca (Theirs)}
+
+                \addplot[fill=blue] coordinates {(Acc,0.5465) (Precision,0.5245) (Recall,0.9962) (F1-score,0.6872)};
+                \addlegendentry{\modelalpaca}
+
+                \addplot[fill=purple]   coordinates {(Acc,0.5027) (Precision,0.5014) (Recall,0.9759) (F1-score,0.6625)};
+                \addlegendentry{\modeldeepseek}
+
+            \end{axis}
+        \end{tikzpicture}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
 
 \begin{frame}{KoPA: Fine-tuning}
     \begin{center}
@@ -153,7 +272,8 @@
                     legend columns=1,
                     % draw=none, % No box around legend
                     % fill=none,
-                    font=\small
+                    font=\small,
+                    nodes={anchor=west}
                 }
             ]
 
@@ -177,117 +297,22 @@
                 \addplot[smooth, thick, violet, dashed]
                 table[x=epoch, y=grad-norm, col sep=space]
                     {../Report/figures/raw-data/lora-DeepSeek-R1-Distill-Llama-8B-finetune.dat};
-                \addlegendentry{DeepSeek Grad Norm}
+                \addlegendentry{\modeldeepseek Grad Norm}
 
             \end{axis}
         \end{tikzpicture}
     \end{center}
 \end{frame}
 
-\begin{frame}{Plots}
-    \begin{columns}[c]
-        \column{.45\textwidth}
-        Retrieval-Augmented Prompting
-        \begin{figure}[ht]
-            \centering
-            \begin{tikzpicture}
-                \begin{axis}[
-                    ybar,
-                    bar width=6pt,
-                    symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
-                    xtick=data,
-                    xticklabel style={rotate=30, anchor=east},
-                    ymin=0,
-                    ymax=1,
-                    ylabel={Score},
-                    width=0.9\textwidth,
-                    height=5cm,
-                    grid=both,
-                    major grid style={line width=.2pt, draw=gray!30},
-                    minor grid style={draw=gray!10},
-                    enlarge x limits=0.2,
-                % Legend placed below with spacing:
-                    legend style={
-                        at={(0.5,-0.28)},
-                        anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3,
-                        draw=none, % Remove box
-                        fill=none,
-                        font=\small
-                    }
-                ]
-
-                    % Bars
-                    \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
-                    \addlegendentry{KICGPT}
-                    \addplot[fill=blue]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
-                    \addlegendentry{\modelministral}
-                    \addplot[fill=purple] coordinates {(MRR,0.2700) (Hits@1,0.1233) (Hits@3,0.2994) (Hits@10,0.6145)};
-                    \addlegendentry{\modeldeepseek}
-
-                \end{axis}
-            \end{tikzpicture}
-            \caption{Link Ordering Evaluation Metrics}
-            \label{fig:link_ordering}
-        \end{figure}
-
-        \column{.45\textwidth}
-        Fine-Tuning-Based Triple Classification
-        \begin{figure}[ht]
-            \centering
-            \begin{tikzpicture}
-                \begin{axis}[
-                    ybar,
-                    bar width=6pt,
-                    symbolic x coords={Accuracy, Precision, Recall, F1-score},
-                    xtick=data,
-                    xticklabel style={rotate=30, anchor=east},
-                    ymin=0,
-                    ymax=1,
-                    ylabel={Score},
-                    width=0.9\textwidth,
-                    height=5cm,
-                    grid=both,
-                    major grid style={line width=.2pt, draw=gray!30},
-                    minor grid style={draw=gray!10},
-                    enlarge x limits=0.2,
-                    legend style={
-                        at={(0.5,-0.28)},
-                        anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3,
-                        draw=none,
-                        fill=none,
-                        font=\small
-                    }
-                ]
-
-                    % Bars
-                    \addplot[fill=gray]   coordinates {(Accuracy,0.8274)  (Precision,0.7791)  (Recall,0.9141)  (F1-score,0.8411)};
-                    \addlegendentry{KoPA}
-
-                    \addplot[fill=blue]   coordinates {(Accuracy,0.5027) (Precision,0.5014) (Recall,0.9759) (F1-score,0.6625)};
-                    \addlegendentry{\modeldeepseek}
-
-                    \addplot[fill=purple] coordinates {(Accuracy,0.5465) (Precision,0.5245) (Recall,0.9962) (F1-score,0.6872)};
-                    \addlegendentry{\modelalpaca}
-                \end{axis}
-            \end{tikzpicture}
-            \caption{CoDeX Performance Evaluation Metrics}
-            \label{fig:codex_evaluation}
-        \end{figure}
-
-    \end{columns}
-\end{frame}
-
 %------------------------------------------------
 
 
-\section{Conclusion}
-%------------------------------------------------
 \begin{frame}{Conclusion}
-    TBD
+
+    \begin{itemize}
+        \item Replicating results is hard
+        \item Something
+    \end{itemize}
 \end{frame}
 
 %\begin{frame}{References}
