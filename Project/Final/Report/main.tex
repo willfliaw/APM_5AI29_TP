@@ -51,51 +51,22 @@
 % COLORED TEXT MANAGEMENT
 % ------------------------------------------------------------------
 
-\usepackage{xcolor}
 \usepackage{todonotes}
 \setuptodonotes{inline=always}
 \setlength {\marginparwidth }{2cm}
-
-% ------------------------------------------------------------------
-% CODE MANAGEMENT
-% ------------------------------------------------------------------
-
-\usepackage{listings}
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{cleveref}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xcolor}
 
 % needs sheel escape activated
 % --shell-escape
 %\usetikzlibrary{external}
 %\tikzexternalize[prefix=figures_tikz_compiled/]
 
-\lstdefinelanguage{Cypher}{
-    morekeywords={
-        MATCH, RETURN, WHERE, CREATE, DELETE, SET, MERGE, DETACH,
-        WITH, LIMIT, SKIP, ORDER, BY, DESC, ASC, OPTIONAL, CALL
-    },
-    sensitive=true,
-    morecomment=[l]{//},
-    morecomment=[s]{/*}{*/},
-    morestring=[b]',
-    morestring=[b]"
-}
-
-% Listing style for better readability
-\lstset{
-    language=Cypher,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{blue},
-    stringstyle=\color{orange},
-    commentstyle=\color{gray},
-    showstringspaces=false,
-    numbers=left,
-    numberstyle=\tiny,
-    breaklines=true,
-    frame=single
-}
-
-\usepackage{xspace}
-\usepackage{amsmath}
-\usepackage{cleveref}
+\definecolor{light-gray}{gray}{0.9}
 
 \usepackage{amsfonts}
 \newcommand{\modelministral}{Ministral-8B\xspace}
@@ -112,24 +83,24 @@
             \vspace{0cm} % without it, bugs, don't know why?
             \centerline{\includegraphics[width=\linewidth]{./images/tp-ipp}}
         }
-         & {
-                \vspace{0cm} % same here
-                \centering
-                \large
-                {\hfill February, 2025}
+        & {
+            \vspace{0cm} % same here
+            \centering
+            \large
+            {\hfill February, 2025}
 
-                \vspace*{.5cm}
-                \textbf{APM\_5AI29\_TP}
+            \vspace*{.5cm}
+            \textbf{APM\_5AI29\_TP}
 
-                \vspace*{.5cm}
-                \setstretch{1.5}
-                {\Large\textbf{Language Models and Structured Data}}
+            \vspace*{.5cm}
+            \setstretch{1.5}
+            {\Large\textbf{Language Models and Structured Data}}
 
-                \vspace*{.5cm}
-                Final Project Report
+            \vspace*{.5cm}
+            Final Project Report
 
-                \vspace*{1cm}
-        }    \\
+            \vspace*{1cm}
+        } \\
         \hline
     \end{tabular}
 \end{center}
@@ -149,6 +120,7 @@ Names: Mochamad Ardiansyah Nurgaha; William Liaw; Eddie Groh; Sriraam Appakutti 
 %
 % ---------------------------------------------------------
 
+
 \section{Abstract}
 
 This work explores Knowledge Graph Completion (KGC) using two similar approaches: prompt-based tail entity ranking and fine-tuning-based triple classification.
@@ -159,6 +131,7 @@ By leveraging structured retrieval for ranking candidates and integrating knowle
 % PROBLEM STATEMENT
 %
 % ---------------------------------------------------------
+
 
 \section{Problem Statement}\label{sec:problem-statement}
 
@@ -227,7 +200,6 @@ Although KoPA modifies model weights, it keeps the KG structure directly accessi
 
 Following the analysis in \cref{sec:background}, we now outline our methodological approach to KGC. Our work examines one representative method from each of the previously discussed categories: KICGPT, a purely prompt-based approach for tail prediction, and KoPA, which applies fine-tuning for triple classification.
 
-
 \subsection{KICGPT: Prompt-Based Link Prediction}
 \label{sec:method:kicgpt}
 
@@ -280,7 +252,6 @@ This ensures consistent formatting across queries and demonstrations, making the
     \item \textbf{Re-Ranking and Final Prediction:} The LLM processes the structured prompt and re-ranks the top-\( m \) candidates, producing an ordered list \( R_{\text{LLM}} \).
     The highest-ranked entities from this list replace the corresponding top-\( m \) results from the retriever, yielding the final ranking.
 \end{itemize}
-
 
 \subsection{KoPA: Fine-Tuning-Based Triple Classification}
 
@@ -346,8 +317,8 @@ Unlike WN18RR, which focuses on lexical semantics, CoDeX-S is sourced from Wikid
         \hline
         Dataset & \#Entities & \#Relations & \#Train & \#Test \\
         \hline
-        WN18RR & 40,943 & 11 & 86,835 & 3,134 \\
-        CoDeX-S & 2,034 & 42 & 32,888 & 3,654 \\
+        WN18RR  & 40,943     & 11          & 86,835  & 3,134  \\
+        CoDeX-S & 2,034      & 42          & 32,888  & 3,654  \\
         \hline
     \end{tabular}
     \caption{Statistics of the datasets used in our experiments.}
@@ -367,28 +338,27 @@ Compared to Alpaca-7B, it benefits from a slightly larger model size, extended c
 \paragraph{DeepSeek-R1-Distill-Llama-8B}~\cite{deepseekai2025deepseekr1distillllama8b} is a distilled version of DeepSeek-R1~\cite{guo2025deepseek}, optimized for reasoning and problem-solving.
 With a strong emphasis on mathematical and coding tasks, it is particularly effective in structured problem domains.
 
-
 \subsection{Evaluation of the KICGPT Approach}
 
 \begin{figure}
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-                ybar, bar width=12pt,
-                symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
-                xtick=data, ymin=0, ymax=0.7, ylabel={Score}, width=12cm, height=7cm, grid=both,
-                major grid style={line width=.2pt, draw=gray!30},
-                minor grid style={draw=gray!10},
-                enlarge x limits=0.2,
-                % Legend placed below with spacing:
-                legend style={
-                        at={(0.5,-0.15)}, anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=4, draw=none, fill=none, font=\small
-                    }]
+            ybar, bar width=12pt,
+            symbolic x coords={MRR, Hits@1, Hits@3, Hits@10},
+            xtick=data, ymin=0, ymax=0.7, ylabel={Score}, width=12cm, height=7cm, grid=both,
+            major grid style={line width=.2pt, draw=gray!30},
+            minor grid style={draw=gray!10},
+            enlarge x limits=0.2,
+        % Legend placed below with spacing:
+            legend style={
+                at={(0.5,-0.15)}, anchor=north,
+                /tikz/every even column/.append style={column sep=10pt},
+                legend columns=4, draw=none, fill=none, font=\small
+            }]
             % Bars
             \addplot[fill=gray]   coordinates {(MRR,0.549)  (Hits@1,0.474)  (Hits@3,0.585)  (Hits@10,0.641)};
-            \addlegendentry{ChatGPT}
+            \addlegendentry{ChatGPT-3.5}
             \addplot[fill=teal]   coordinates {(MRR,0.3112) (Hits@1,0.1707) (Hits@3,0.3711) (Hits@10,0.5862)};
             \addlegendentry{\modelministral}
             \addplot[fill=purple] coordinates {(MRR,0.2700) (Hits@1,0.1233) (Hits@3,0.2994) (Hits@10,0.6145)};
@@ -398,15 +368,34 @@ With a strong emphasis on mathematical and coding tasks, it is particularly effe
         \end{axis}
     \end{tikzpicture}
     \caption{Comparison of our results on the WN18RR test set with those from Wei et al.~\cite{wei2023kicgpt} (shown in gray). We evaluated \modelalpaca and \modeldeepseek using the same methodology, but also including a zero-shot setting.
-}
-    \label{fig:link_ordering}
+    }
+    \label{fig:kicgpt_evaluation_link_ordering}
 \end{figure}
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|l|c|c|c|c}
+        \toprule
+        \textbf{Model}                   & \textbf{MRR}   & \textbf{Hits@1} & \textbf{Hits@3} & \textbf{Hits@10} \\
+        \midrule
+
+        ChatGPT (Theirs)                 & \textbf{0.564} & \textbf{0.478}  & \textbf{0.612}  & \textbf{0.677}   \\
+        Mistral-7B (Ours)                & 0.3112         & 0.1707          & 0.3711          & 0.5862           \\
+        DeepSeek-7B (Ours)               & 0.2700         & 0.1233          & 0.2994          & 0.6145           \\
+        DeepSeek-7B$_{zero-shot}$ (Ours) & 0.2461         & 0.0980          & 0.2580          & 0.6120           \\
+
+        \bottomrule
+    \end{tabular}
+    \caption{Results from \cref{fig:kicgpt_evaluation_link_ordering} in tabular format. See \cref{tab:kicgpt_detailed_comparison} in appendix for detailled comparison.}
+    \label{tab:kicgpt_evaluation_link_ordering}
+\end{table}
+
 
 All experiments were conducted on a system equipped with an NVIDIA RTX A5000 GPU with 24 GiB of VRAM, an Intel Xeon W-1270P CPU running at 3.80 GHz, and 64 GB of RAM.
 
 As previously discussed, this approach does not require modifications to the models themselves.
 However, while the original implementation relied on the ChatGPT API, we adapted it to locally running models.
-Specifically, in \cref{fig:link_ordering} we evaluated \modelministral and \modeldeepseek, comparing their performance against the results reported by Wei et al.~\cite{wei2023kicgpt}.
+Specifically, in \cref{fig:kicgpt_evaluation_link_ordering} we evaluated \modelministral and \modeldeepseek, comparing their performance against the results reported by Wei et al.~\cite{wei2023kicgpt}.
 
 \modelministral followed prompt instructions closely and rarely produced unparsable output.
 However, it significantly underperformed compared to the original study,
@@ -417,12 +406,11 @@ However, this process was often excessively verbose, even when explicitly instru
 Additionally, it frequently truncated its final responses, replacing parts of the output with ellipses (\dots), likely due to a focus loss while reasoning about the problem.
 Moreover, \modeldeepseek sometimes disregarded specific prompt instructions, potentially because it is primarily tuned for mathematical and coding tasks.
 Since the full-size Deepseek-R1 model is known to suffer from degraded performance with few-shot prompting~\cite{guo2025deepseek}, a similar issue may affect this distilled variant.
-However, as the few-shot examples contain domain-specific information, removing them entirely could  also further reduce performance.
+However, as the few-shot examples contain domain-specific information, removing them entirely could also further reduce performance.
 
 Both models performed surprisingly on-par with ChatGPT in the Hits@10 evaluation.
 However, this is likely due to variations in output length rather than genuine ranking improvements.
 Since evaluation is based on the options generated by the LLM rather than the full ground-truth ranking, models that produce shorter responses inherently increase their chances of including the correct answer among the top-ranked candidates.
-
 
 \subsection{Evaluation of the KoPA Approach}
 
@@ -431,24 +419,24 @@ Since evaluation is based on the options generated by the LLM rather than the fu
     \begin{tikzpicture}
         % Group plot configuration
         \begin{groupplot}[
-                group style={
-                        group size=3 by 1,       % 3 plots in 1 row
-                        horizontal sep=0.3cm     % Adjust spacing between plots
-                    },
-                width=0.38\textwidth,        % Maximized plot width
-                ymode=log,                   % Log-scale y-axis for ALL plots
-                xmin=0, xmax=3,              % Unified x-axis range
-                ymin=1e-3, ymax=1,           % Unified y-axis range across all plots
-                xlabel=Epoch,
-                xtick distance=0.5,          % Uniform tick spacing
-                ytick distance=10,           % Log-scale tick separation
-                minor y tick num=9,          % Minor tick marks for readability
-            ]
+            group style={
+                group size=3 by 1,       % 3 plots in 1 row
+                horizontal sep=0.3cm     % Adjust spacing between plots
+            },
+            width=0.38\textwidth,        % Maximized plot width
+            ymode=log,                   % Log-scale y-axis for ALL plots
+            xmin=0, xmax=3,              % Unified x-axis range
+            ymin=1e-3, ymax=1,           % Unified y-axis range across all plots
+            xlabel=Epoch,
+            xtick distance=0.5,          % Uniform tick spacing
+            ytick distance=10,           % Log-scale tick separation
+            minor y tick num=9,          % Minor tick marks for readability
+        ]
 
             %------------- Plot (a) Alpaca -----------------
             \nextgroupplot[
                 title=\modelalpaca,
-                % Hide y-axis labels for alignment
+            % Hide y-axis labels for alignment
                 ylabel=Loss / Gradient Norm
             ]
             \addplot[smooth, thick, blue]
@@ -523,12 +511,12 @@ Its loss curve closely resembles that of \modelalpaca, confirming stable converg
 A direct comparison reveals that both models exhibit nearly identical loss trajectories, which would suggest that they should have comparable performance.
 
 We evaluated the prediction performance of \modelalpaca and \modeldeepseek on the CoDeX-S test set and compared our results to those reported by Qin et al.~\cite{qin2023kopa}.
-As shown in \cref{fig:codex_evaluation}, both models achieve similar overall results, with \modeldeepseek consistently lagging slightly behind \modelalpaca across all metrics.
+As shown in \cref{fig:codex_kopa_evaluation}, both models achieve similar overall results, with \modeldeepseek consistently lagging slightly behind \modelalpaca across all metrics.
 The evaluation process took 52 minutes for \modelalpaca and 56 minutes for \modeldeepseek.
 
 While we follow the same methodological approach as the original work, our results fall significantly short of the reported performance.
 The cause of this discrepancy is unclear, though possible explanations include minor differences in hyperparameters such as batch size and learning rate, which we had to adjust to accommodate our computational constraints.
-However, given the extent of the performance gap, it is unlikely that these adjustments alone fully explain the differences.
+However, given the extent of the performance gap, it is very unlikely that these adjustments alone fully explain the differences.
 
 A notable issue observed in both models is a strong bias toward classifying triples as true.
 Despite the test set containing an equal distribution of true and false triples (1828/1828), \modelalpaca classified 3472 triples as true and only 184 as false, while \modeldeepseek classified 3558 as true and only 98 as false.
@@ -544,18 +532,18 @@ Allowing for a reasoning step could potentially improve performance, but this wo
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-                ybar, bar width=12pt,
-                symbolic x coords={Accuracy, Precision, Recall, F1-score},
-                xtick=data, ymin=0, ymax=1,
-                ylabel={Score}, width=12cm, height=7cm, grid=both,
-                major grid style={line width=.2pt, draw=gray!30},
-                minor grid style={draw=gray!10},
-                enlarge x limits=0.2,
-                legend style={
-                        at={(0.5,-0.15)}, anchor=north,
-                        /tikz/every even column/.append style={column sep=10pt},
-                        legend columns=3, draw=none, fill=none,
-                        font=\small}]
+            ybar, bar width=12pt,
+            symbolic x coords={Accuracy, Precision, Recall, F1-score},
+            xtick=data, ymin=0, ymax=1,
+            ylabel={Score}, width=12cm, height=7cm, grid=both,
+            major grid style={line width=.2pt, draw=gray!30},
+            minor grid style={draw=gray!10},
+            enlarge x limits=0.2,
+            legend style={
+                at={(0.5,-0.15)}, anchor=north,
+                /tikz/every even column/.append style={column sep=10pt},
+                legend columns=3, draw=none, fill=none,
+                font=\small}]
 
             \addplot[fill=gray]   coordinates {(Accuracy,0.8274)  (Precision,0.7791)  (Recall,0.9141)  (F1-score,0.8411)};
             \addlegendentry{\modelalpaca (Qin et al.~\cite{qin2023kopa})}
@@ -569,8 +557,26 @@ Allowing for a reasoning step could potentially improve performance, but this wo
         \end{axis}
     \end{tikzpicture}
     \caption{Comparison of our replication of the original results from Qin et al.~\cite{qin2023kopa} using \modelalpaca, along with our additional results from \modeldeepseek, all evaluated on the CoDeX-S test set.}
-    \label{fig:codex_evaluation}
+    \label{fig:codex_kopa_evaluation}
 \end{figure}
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|c|c|c|c}
+        \toprule
+        \textbf{Model}        & \textbf{Acc}   & \textbf{P} & \textbf{R} & \textbf{F1}    \\
+        \midrule
+
+        \modelalpaca (Theirs) & \textbf{82.74} & 77.91      & 91.41      & \textbf{84.11} \\
+        \modelalpaca (Ours)   & 54.65          & 52.45      & 99.62      & 68.72          \\
+        \modeldeepseek (Ours) & 50.27          & 50.14      & 97.59      & 66.25          \\
+
+        \bottomrule
+    \end{tabular}
+    \caption{Results from \cref{fig:codex_kopa_evaluation} in tabular format. See \cref{tab:kicgpt_detailed_comparison} in appendix for detailled comparison.}
+    \label{tab:codex_kopa_evaluation}
+\end{table}
+
 
 % ---------------------------------------------------------
 %
@@ -580,8 +586,6 @@ Allowing for a reasoning step could potentially improve performance, but this wo
 
 
 \section{Conclusion and Future Work}\label{sec:conclusion-and-future-work}
-\todo{TBD otherwise leave out}
-\todo{Summarize the key findings and how they link back to your problem statement. Suggest improvements or next steps (e.g., new dataset, advanced fusion technique, or GNN-based approach). Highlight what you learned and what remains challenging.}
 
 In summary, we examined two approaches for KGC—KICGPT, a purely prompt-based prediction method, and KoPA, a fine-tuning-based triple classification approach.
 KICGPT leverages in-context learning via structured prompts and a optimized retriever, offering a training-free alternative that can be applied directly to various Large Language Models.
@@ -594,5 +598,103 @@ Overall, these findings suggest that the optimal approach to Knowledge Graph Com
 Future research may focus on hybrid strategies that jointly leverage the prompt-driven adaptability of KICGPT and the structural grounding of KoPA. Such endeavors could address current limitations—such as handling large, incomplete, and evolving knowledge graphs in a more controlled and scalable manner—while further improving link prediction and triple classification performance.
 
 \bibliography{main}
+
+\appendix
+
+
+\section{Detailled Results}
+
+In \cref{tab:kicgpt_detailed_comparison}, we extend the detailed comparisons from Wei et al.~\cite{wei2023kicgpt} to include our results, and similarly, in \cref{tab:kopa_detailled_comparison}, we incorporate our findings alongside those of Qin et al.~\cite{qin2023kopa}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|l|c|c|c|c|}
+        \toprule
+        \textbf{Category} & \textbf{Model}                           & \textbf{MRR}      & \textbf{Hits@1}   & \textbf{Hits@3}   & \textbf{Hits@10}  \\
+        \midrule
+
+        \multirow{9}{*}{Triple-based}
+        & RESCAL~\cite{nickel2011three}            & 0.467             & 0.439             & 0.478             & 0.516             \\
+        & TransE~\cite{bordes2013translating}      & 0.243             & 0.043             & 0.441             & 0.532             \\
+        & DistMult~\cite{yang2014embedding}        & 0.430             & 0.390             & 0.440             & 0.490             \\
+        & ComplEx~\cite{trouillon2016complex}      & 0.440             & 0.410             & 0.460             & 0.510             \\
+        & RotatE~\cite{sun2019rotate}              & 0.476             & 0.428             & 0.492             & 0.571             \\
+        & TuckER~\cite{balavzevic2019tucker}       & 0.470             & 0.443             & 0.482             & 0.526             \\
+        & HAKE~\cite{zhang2020learning}            & 0.497             & 0.452             & 0.516             & 0.582             \\
+        & CompGCN~\cite{vashishth2019composition}  & 0.479             & 0.443             & 0.494             & 0.546             \\
+        & HittER~\cite{chen-etal-2021-hitter}      & 0.496             & 0.449             & 0.514             & 0.586             \\
+        \midrule
+
+        \multirow{5}{*}{Text-based}
+        & Pretrain-KGE~\cite{zhang2020pretrain}    & 0.235             & -                 & -                 & 0.557             \\
+        & KG-BERT~\cite{yao2019kgbert}             & 0.216             & 0.041             & 0.302             & 0.524             \\
+        & StAR~\cite{wang2021structure}            & 0.364             & 0.222             & 0.436             & 0.647             \\
+        & MEM-KGC (w/o EP)~\cite{choi2021mem}      & 0.533             & 0.473             & 0.570             & 0.636             \\
+        & MEM-KGC (w/ EP)~\cite{choi2021mem}       & \underline{0.557} & \underline{0.475} & \underline{0.604} & \textbf{0.704} \\
+        \midrule
+
+        \multirow{2}{*}{LLM-based}
+        & ChatGPT$_{zero-shot}$~\cite{zhu2023llms} & -                 & 0.190             & -                 & -                 \\
+        & ChatGPT$_{one-shot}$~\cite{zhu2023llms}  & -                 & 0.212             & -                 & -                 \\
+
+        \midrule
+
+        \multirow{4}{*}{KICGPT}
+        & ChatGPT (Theirs)                         & \textbf{0.564}    & \textbf{0.478}    & \textbf{0.612}    & \underline{0.677} \\
+        & Mistral-7B (Ours)                        & 0.3112            & 0.1707            & 0.3711            & 0.5862            \\
+        & DeepSeek-7B (Ours)                       & 0.2700            & 0.1233            & 0.2994            & 0.6145            \\
+        & DeepSeek-7B$_{zero-shot}$ (Ours)         & 0.2461            & 0.0980            & 0.2580            & 0.6120            \\
+
+        \bottomrule
+    \end{tabular}
+
+    \caption{Comparison between various methods on WN18RR. The best result in terms of each metric is shown in \textbf{bold} and the second best is \underline{underlined}. Figure adapted from Wei et al.~\cite{wei2023kicgpt}.}
+    \label{tab:kicgpt_detailed_comparison}
+\end{table}
+
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|c|>{\columncolor{light-gray}}c|cc|>{\columncolor{light-gray}}c|}
+        \toprule
+        \textbf{Category} & \textbf{Model}                      & \textbf{Acc}      & \textbf{P} & \textbf{R} & \textbf{F1}       \\ \midrule
+
+        \multirow{4}{*}{Embedding-based}
+        & TransE~\cite{bordes2013translating} & 72.07             & 71.91      & 72.42      & 72.17             \\
+        & DistMult~\cite{yang2014embedding}   & 66.79             & 69.67      & 59.46      & 64.16             \\
+        & ComplEx~\cite{trouillon2016complex} & 67.64             & 67.84      & 67.06      & 67.45             \\
+        & RotatE~\cite{sun2019rotate}         & 75.68             & 75.66      & 75.71      & 75.69             \\
+        \midrule
+
+        \multirow{1}{*}{PLM-based}
+        & KG-BERT~\cite{yao2019kgbert}        & 77.30             & 70.96      & 92.43      & 80.28             \\
+        \midrule
+
+        \multirow{6}{*}{LLM-based Training-free}
+        & Zero-shot(Alpaca)                   & 50.62             & 50.31      & 99.83      & 66.91             \\
+        & Zero-shot(GPT-3.5)                  & 54.68             & 69.13      & 16.94      & 27.21             \\
+        & ICL(1-shot)                         & 49.86             & 49.86      & 50.59      & 50.17             \\
+        & ICL(2-shot)                         & 52.95             & 51.54      & 98.85      & 67.75             \\
+        & ICL(4-shot)                         & 51.14             & 50.58      & 99.83      & 67.14             \\
+        & ICL(8-shot)                         & 50.62             & 50.31      & 99.83      & 66.91             \\
+        \midrule
+
+        \multirow{4}{*}{LLM-based Fine-tuning}
+        & KG-LLaMA~\cite{yao2023exploring}    & 79.43             & 78.67      & 80.74      & 79.69             \\
+        & KG-Alpaca~\cite{yao2023exploring}   & 80.25             & 79.38      & 81.73      & 80.54             \\
+        & Vanilla IT                          & 81.18             & 77.01      & 88.89      & 82.52             \\
+        & Structure-aware IT                  & \underline{81.27} & 77.14      & 88.40      & \underline{82.58} \\
+        \midrule
+
+        \multirow{3}{*}{KoPA}
+        & \modelalpaca (Theirs)               & \textbf{82.74}    & 77.91      & 91.41      & \textbf{84.11}    \\
+        & \modelalpaca (Ours)                 & 54.65             & 52.45      & 99.62      & 68.72             \\
+        & \modeldeepseek (Ours)               & 50.27             & 50.14      & 97.59      & 66.25             \\
+
+        \bottomrule
+    \end{tabular}
+    \caption{Triple classification results on the CoDeX-S dataset. We report the accuracy (Acc), precision (P), recall (R), and F1-score (F1) for each method. The best \textbf{Acc / F1} results in baselines are marked with \underline{underline}, best result for accuracy is marked in \textbf{bold}. Figure adapted and extended from Qin et al.~\cite{qin2023kopa}.}
+    \label{tab:kopa_detailled_comparison}
+\end{table}
 
 \end{document}
