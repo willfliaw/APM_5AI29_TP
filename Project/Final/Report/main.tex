@@ -588,15 +588,15 @@ Allowing for a reasoning step could potentially improve performance, but this wo
 \section{Conclusion and Future Work}\label{sec:conclusion-and-future-work}
 
 In summary, we examined two approaches for KGC—KICGPT, a purely prompt-based prediction method, and KoPA, a fine-tuning-based triple classification approach.
-KICGPT leverages in-context learning via structured prompts and a optimized retriever, offering a training-free alternative that can be applied directly to various Large Language Models.
-KoPA, by contrast, integrates structural embeddings into the LLM's weights, through training with Knowledge Prefix Adapter, enabling more targeted triple classification by unifying textual and relational cues.
+KICGPT leverages in-context learning via structured prompts and an optimized retriever, offering a training-free alternative that can be applied directly to various Large Language Models.
+KoPA, by contrast, integrates structural embeddings into the LLM's weights, through training with a Knowledge Prefix Adapter, enabling more targeted triple classification by unifying textual and relational cues.
 
 Our empirical results highlight that while prompt-based methods like KICGPT benefit from flexibility and reduced computational demands, performance and output consistency can vary depending on the chosen LLM's internal knowledge and adherence to prompt instructions.
 Fine-tuning-based methods such as KoPA can be more consistent, though they often incur longer training times and may require careful balancing between textual generation and structural consistency to avoid overconfident predictions.
+Notably, LLMs specifically fine-tuned for complex reasoning may underperform in tasks that demand strict instruction following or context apprehension, or tasks with limited ``reasoning room'' thereby underscoring that no single LLM type is universally optimal across all scenarios.
 
 Overall, these findings suggest that the optimal approach to Knowledge Graph Completion hinges on task requirements and resource constraints: KICGPT excels when rapid deployment is a priority, whereas KoPA offers more robust control over the classification process at the cost of additional training.
 Future research may focus on hybrid strategies that jointly leverage the prompt-driven adaptability of KICGPT and the structural grounding of KoPA. Such endeavors could address current limitations—such as handling large, incomplete, and evolving knowledge graphs in a more controlled and scalable manner—while further improving link prediction and triple classification performance.
-
 \bibliography{main}
 
 \pagebreak
